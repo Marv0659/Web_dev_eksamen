@@ -1,4 +1,4 @@
-from flask import Flask, session, render_template, redirect, url_for, make_response, request
+from flask import Flask, session, render_template, redirect, url_for, make_response, request, Blueprint
 from flask_session import Session
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
@@ -184,9 +184,15 @@ def signup():
                            hashed_password, user_avatar, user_created_at, user_deleted_at, user_blocked_at, 
                            user_updated_at, user_verified_at, user_verification_key))
         
-        # x.send_verify_email(user_email, user_verification_key)
+        
+
+        x.send_verify_email(user_email, user_verification_key)
         db.commit()
+
+        q = "INSERT INTO users_roles VALUES(%s, %s)"
+        cursor.execute(q,(user_pk, x.CUSTOMER_ROLE_PK))
     
+        db.commit()
         return """<template mix-redirect="/login"></template>""", 201
     
     except Exception as ex:
@@ -200,36 +206,54 @@ def signup():
             if "users.user_email" in str(ex): 
                 toast = render_template("___toast.html", message="email not available")
                 return f"""<template mix-target="#toast" mix-bottom>{toast}</template>""", 400
-            return f"""<template mix-target="#toast" mix-bottom>System upgrating</template>""", 500        
+            return f"""<template mix-target="#toast" mix-bottom>System upgrading</template>""", 500        
         return f"""<template mix-target="#toast" mix-bottom>System under maintenance</template>""", 500    
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+##############################
+
+login = Blueprint("login", __name__)
 
 ##############################
 @app.post("/login")
 def login():
     try:
-
+        # Detailed logging of input validation
         user_email = x.validate_user_email()
         user_password = x.validate_user_password()
 
+        print("Validated Email:", repr(user_email))  # Use repr to show exact string
+        print("Validated Password Length:", len(user_password))
+
         db, cursor = x.db()
-        q = """ SELECT * FROM users 
-                JOIN users_roles 
-                ON user_pk = user_role_user_fk 
-                JOIN roles
-                ON role_pk = user_role_role_fk
-                WHERE user_email = %s"""
+
+        # Modified query with more flexible matching
+        q = """
+            SELECT * FROM users
+            JOIN users_roles ON user_pk = user_role_user_fk
+            JOIN roles ON role_pk = user_role_role_fk
+            WHERE LOWER(TRIM(user_email)) = LOWER(TRIM(%s))
+        """
         cursor.execute(q, (user_email,))
         rows = cursor.fetchall()
+
+        print("Number of rows found:", len(rows))
+        if rows:
+            print("Found user details:", rows[0])
+        else:
+            print("No user found with email:", user_email)
+
+        # Rest of your existing code...
+
         if not rows:
             toast = render_template("___toast.html", message="user not registered")
             return f"""<template mix-target="#toast">{toast}</template>""", 400     
         if not check_password_hash(rows[0]["user_password"], user_password):
             toast = render_template("___toast.html", message="invalid credentials")
             return f"""<template mix-target="#toast">{toast}</template>""", 401
+        
         roles = []
         for row in rows:
             roles.append(row["role_name"])
@@ -241,23 +265,93 @@ def login():
             "roles": roles
         }
         ic(user)
+
         session["user"] = user
+
         if len(roles) == 1:
             return f"""<template mix-redirect="/{roles[0]}"></template>"""
         return f"""<template mix-redirect="/choose-role"></template>"""
+        # db.commit()
+    
     except Exception as ex:
+
         ic(ex)
         if "db" in locals(): db.rollback()
-        if isinstance(ex, x.CustomException): 
-            toast = render_template("___toast.html", message=ex.message)
-            return f"""<template mix-target="#toast" mix-bottom>{toast}</template>""", ex.code    
+
+        # My own exception
+        if isinstance(ex, x.CustomException):
+            return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
+        
+        # Database exception
         if isinstance(ex, x.mysql.connector.Error):
             ic(ex)
-            return "<template>System upgrating</template>", 500        
-        return "<template>System under maintenance</template>", 500  
+            if "users.user_email" in str(ex):
+                return """<template mix-target="#toast" mix-bottom>email not available</template>""", 400
+            return "<template>System upgrading</template>", 500  
+      
+        # Any other exception
+        return """<template mix-target="#toast" mix-bottom>System under maintenance</template>""", 500  
+    
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
+
+
+
+
+##############################
+# @app.post("/login")
+# def login():
+#     try:
+
+#         user_email = x.validate_user_email()
+#         user_password = x.validate_user_password()
+
+#         db, cursor = x.db()
+#         q = """ SELECT * FROM users 
+#                 JOIN users_roles 
+#                 ON user_pk = user_role_user_fk 
+#                 JOIN roles
+#                 ON role_pk = user_role_role_fk
+#                 WHERE user_email = %s"""
+#         cursor.execute(q, (user_email,))
+#         rows = cursor.fetchall()
+#         ic(rows)
+#         if not rows:
+#             toast = render_template("___toast.html", message="user not registered")
+#             return f"""<template mix-target="#toast">{toast}</template>""", 400     
+#         if not check_password_hash(rows[0]["user_password"], user_password):
+#             toast = render_template("___toast.html", message="invalid credentials")
+#             return f"""<template mix-target="#toast">{toast}</template>""", 401
+#         roles = []
+#         for row in rows:
+#             roles.append(row["role_name"])
+#         user = {
+#             "user_pk": rows[0]["user_pk"],
+#             "user_name": rows[0]["user_name"],
+#             "user_last_name": rows[0]["user_last_name"],
+#             "user_email": rows[0]["user_email"],
+#             "roles": roles
+#         }
+#         ic(user)
+#         session["user"] = user
+#         if len(roles) == 1:
+#             return f"""<template mix-redirect="/{roles[0]}"></template>"""
+#         return f"""<template mix-redirect="/choose-role"></template>"""
+#     except Exception as ex:
+#         ic(ex)
+#         if "db" in locals(): db.rollback()
+#         if isinstance(ex, x.CustomException): 
+#             toast = render_template("___toast.html", message=ex.message)
+#             return f"""<template mix-target="#toast" mix-bottom>{toast}</template>""", ex.code    
+#         if isinstance(ex, x.mysql.connector.Error):
+#             ic(ex)
+#             return "<template>System upgrating</template>", 500        
+#         return "<template>System under maintenance</template>", 500  
+#     finally:
+#         if "cursor" in locals(): cursor.close()
+#         if "db" in locals(): db.close()
 
 
 ##############################

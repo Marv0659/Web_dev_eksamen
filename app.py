@@ -125,6 +125,29 @@ def view_admin():
 
 
 ##############################
+@app.get("/items")
+@x.no_cache
+def view_items():
+    db, cursor = x.db()
+
+    query = """
+            SELECT items.item_title, items.item_price, items.item_image, users.user_name AS restaurant_name
+            FROM items
+            JOIN users ON items.item_user_fk = users.user_pk
+            JOIN users_roles ON users.user_pk = users_roles.user_role_user_fk
+            WHERE users_roles.user_role_role_fk = %s
+        """
+    
+    cursor.execute(query, (x.RESTAURANT_ROLE_PK,))
+    items = cursor.fetchall()
+
+    return render_template("view_items.html", items=items)
+
+
+
+
+
+##############################
 @app.get("/choose-role")
 @x.no_cache
 def view_choose_role():
@@ -134,6 +157,9 @@ def view_choose_role():
         return redirect(url_for("view_login"))
     user = session.get("user")
     return render_template("view_choose_role.html", user=user, title="Choose role")
+
+
+
 
 
 ##############################
@@ -358,14 +384,43 @@ def login():
 @app.post("/items")
 def create_item():
     try:
+
+        if not session.get("user"):
+            x.raise_custom_exception("Please log in to create an item", 401)
+
         # TODO: validate item_title, item_description, item_price
+        #if not session.get("user"): x.raise_custom_exception("please login", 401)
+        item_title = x.validate_item_title()
+        item_description = x.validate_item_description()
+        item_price = x.validate_item_price()
         file, item_image_name = x.validate_item_image()
 
         # Save the image
         file.save(os.path.join(x.UPLOAD_ITEM_FOLDER, item_image_name))
         # TODO: if saving the image went wrong, then rollback by going to the exception
+        if not item_image_name:
+            x.raise_custom_exception("cannot save image", 500)
+        
+
+
+        item_pk = str(uuid.uuid4())
+        item_user_fk = session.get("user").get("user_pk")
+        
+
+        db, cursor = x.db()
+
+        q = """
+            INSERT INTO items (item_pk, item_user_fk, item_title, item_description, item_price, item_image)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+
+        cursor.execute(q, (item_pk, item_user_fk, item_title, item_description, item_price, item_image_name))
+        db.commit()
+
+
         # TODO: Success, commit
-        return item_image_name
+
+        return """<template>item created</template>""", 201
     except Exception as ex:
         ic(ex)
         if "db" in locals(): db.rollback()

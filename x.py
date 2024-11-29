@@ -114,6 +114,40 @@ def validate_user_password():
     return user_password
 
 ##############################
+ITEM_TITLE_MIN = 2
+ITEM_TITLE_MAX = 50
+ITEM_TITLE_REGEX = f"^.{{{ITEM_TITLE_MIN},{ITEM_TITLE_MAX}}}$"
+def validate_item_title():
+    error = f"Title must be between {ITEM_TITLE_MIN} and {ITEM_TITLE_MAX} characters"
+    item_title = request.form.get("item_title", "").strip()
+    if not re.match(ITEM_TITLE_REGEX, item_title): raise_custom_exception(error, 400)
+    return item_title
+
+ITEM_DESCRIPTION_MIN = 5
+ITEM_DESCRIPTION_MAX = 500
+ITEM_DESCRIPTION_REGEX = f"^.{{{ITEM_DESCRIPTION_MIN},{ITEM_DESCRIPTION_MAX}}}$"
+def validate_item_description():
+    error = f"Description must be between {ITEM_DESCRIPTION_MIN} and {ITEM_DESCRIPTION_MAX} characters"
+    item_description = request.form.get("item_description", "").strip()
+    if not re.match(ITEM_DESCRIPTION_REGEX, item_description): raise_custom_exception(error, 400)
+    return item_description
+
+def validate_item_price():
+    error = "Invalid price"
+    try:
+        item_price = float(request.form.get("item_price", "").strip())
+        if item_price <= 0:
+            raise_custom_exception(error, 400)
+        return item_price
+    except ValueError:
+        raise_custom_exception(error, 400)
+
+
+
+
+
+
+##############################
 REGEX_UUID4 = "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 def validate_uuid4(uuid4 = ""):
     error = f"invalid uuid4"

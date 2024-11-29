@@ -69,6 +69,7 @@ try:
             item_user_fk CHAR(36),
             item_title VARCHAR(50) NOT NULL,
             item_price DECIMAL(5,2) NOT NULL,
+            item_description VARCHAR(500),
             item_image VARCHAR(50),
             PRIMARY KEY(item_pk),
             FOREIGN KEY (item_user_fk) REFERENCES users(user_pk) ON DELETE CASCADE ON UPDATE RESTRICT

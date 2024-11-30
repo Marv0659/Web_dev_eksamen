@@ -157,8 +157,9 @@ def validate_uuid4(uuid4 = ""):
     return uuid4
 
 ##############################
-UPLOAD_ITEM_FOLDER = './images'
+UPLOAD_ITEM_FOLDER = './static/images'
 ALLOWED_ITEM_FILE_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+REGEX_ITEM_IMAGE = r'^.*\.(jpg|jpeg|png|gif)$'
 
 def validate_item_image():
     if 'item_file' not in request.files: raise_custom_exception("item_file missing", 400)
@@ -170,7 +171,7 @@ def validate_item_image():
         file_extension = os.path.splitext(file.filename)[1][1:]
         ic(file_extension)
         if file_extension not in ALLOWED_ITEM_FILE_EXTENSIONS: raise_custom_exception("item_file invalid extension", 400)
-        filename = str(uuid.uuid4()) + file_extension
+        filename = str(uuid.uuid4())+"." + file_extension
         return file, filename 
 
 

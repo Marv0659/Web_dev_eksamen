@@ -8,7 +8,14 @@
         <img src="{{ url_for('static', filename='images/' + item.item_image) }}" alt="{{ item.item_title }}"
             class="w-full h-auto rounded-8px">
         <h3 class="text-150">{{ item.item_title }}</h3>
+
+
+        {% if item.item_description %}
         <p>{{ item.item_description }}</p>
+        {% else %}
+        <p class="text-c-gray">No description available.</p>
+        {% endif %}
+
         <p><strong>Price:</strong> ${{ item.item_price }}</p>
         <p><strong>Restaurant:</strong> {{ item.restaurant_name }}</p>
     </div>

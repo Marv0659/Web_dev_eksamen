@@ -128,10 +128,15 @@ def view_admin():
 @app.get("/items")
 @x.no_cache
 def view_items():
+
+
+    if not session.get("user", ""):
+        return redirect(url_for("view_login"))
+    
     db, cursor = x.db()
 
     query = """
-            SELECT items.item_title, items.item_price, items.item_image, users.user_name AS restaurant_name
+            SELECT items.item_title, items.item_price,items.item_description, items.item_image, users.user_name AS restaurant_name
             FROM items
             JOIN users ON items.item_user_fk = users.user_pk
             JOIN users_roles ON users.user_pk = users_roles.user_role_user_fk
@@ -143,6 +148,20 @@ def view_items():
 
     return render_template("view_items.html", items=items)
 
+
+
+
+
+##############################
+@app.get("/items/new")
+@x.no_cache
+def view_new_item():
+    if not session.get("user", ""): 
+        return redirect(url_for("view_login"))
+    user = session.get("user")
+    if not "restaurant" in user.get("roles", ""):
+        return redirect(url_for("view_login"))
+    return render_template("view_create_item.html", user=user, title="New item", x=x)
 
 
 
@@ -385,11 +404,14 @@ def login():
 def create_item():
     try:
 
-        if not session.get("user"):
-            x.raise_custom_exception("Please log in to create an item", 401)
+        # check if user has the role restaurant
+        if not session.get("user"): 
+            return redirect(url_for("view_login"))
+        if not "restaurant" in session.get("user").get("roles"): 
+            return redirect(url_for("view_login"))
+
 
         # TODO: validate item_title, item_description, item_price
-        #if not session.get("user"): x.raise_custom_exception("please login", 401)
         item_title = x.validate_item_title()
         item_description = x.validate_item_description()
         item_price = x.validate_item_price()
@@ -416,11 +438,16 @@ def create_item():
 
         cursor.execute(q, (item_pk, item_user_fk, item_title, item_description, item_price, item_image_name))
         db.commit()
+        toast = render_template("___toast_success.html", message="item created")
 
 
         # TODO: Success, commit
 
-        return """<template>item created</template>""", 201
+        return f"""<template>item created</template>
+        <template mix-target="#toast" mix-bottom>{toast}</template>
+        
+        
+        """, 201
     except Exception as ex:
         ic(ex)
         if "db" in locals(): db.rollback()

@@ -84,7 +84,9 @@ def view_login():
         if "customer" in session.get("user").get("roles"):
             return redirect(url_for("view_customer")) 
         if "partner" in session.get("user").get("roles"):
-            return redirect(url_for("view_partner"))         
+            return redirect(url_for("view_partner"))    
+        if "restaurant" in session.get("user").get("roles"):
+            return redirect(url_for("view_restaurant_items"))
     return render_template("view_login.html", x=x, title="Login", message=request.args.get("message", ""))
 
 
@@ -147,6 +149,40 @@ def view_items():
     items = cursor.fetchall()
 
     return render_template("view_items.html", items=items)
+
+##############################
+@app.get("/restaurant/items")
+def view_restaurant_items():
+    try:
+        # Ensure the user is logged in
+        user = session.get("user")
+        if not user:
+            x.raise_custom_exception("Please log in to view your items", 401)
+
+        user_pk = user.get("user_pk")
+
+        # Ensure the user has the 'restaurant' role
+        if not "restaurant" in user.get("roles"):
+            x.raise_custom_exception("You do not have the restaurant role", 401)
+
+        # Fetch items belonging to the current restaurant
+        db, cursor = x.db()
+        query_items = """
+            SELECT item_pk, item_title, item_description, item_price, item_image
+            FROM items
+            WHERE item_user_fk = %s
+        """
+        cursor.execute(query_items, (user_pk,))
+        items = cursor.fetchall()
+
+        return render_template("view_restaurant_items.html", items=items, title="My Items")
+
+    except Exception as ex:
+        ic(ex)
+        return "Error retrieving your items", 500
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 
 
@@ -341,6 +377,61 @@ def login():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+##############################
+
+@app.post("/items/<item_pk>/edit")
+@x.no_cache
+def update_item(item_pk):
+    try:
+        # Ensure the user is logged in
+        if not session.get("user", ""): 
+            return redirect(url_for("view_login"))
+        
+        # Ensure the user has the 'restaurant' role
+        if not "restaurant" in session.get("user").get("roles", ""):
+            return redirect(url_for("view_login"))
+        
+        # Validate the item title, description, and price
+        item_title = x.validate_item_title()
+        item_description = x.validate_item_description()
+        item_price = x.validate_item_price()
+        
+        # Validate the image
+        file, item_image_name = x.validate_item_image()
+        file.save(os.path.join(x.UPLOAD_ITEM_FOLDER, item_image_name))
+        if not item_image_name:
+            x.raise_custom_exception("Cannot save image", 500)
+        
+        # Update the item in the database
+        db, cursor = x.db()
+        q = """
+            UPDATE items
+            SET item_title = %s, item_description = %s, item_price = %s, item_image = %s
+            WHERE item_pk = %s
+        """
+        cursor.execute(q, (item_title, item_description, item_price, item_image_name, item_pk))
+        if cursor.rowcount != 1:
+            x.raise_custom_exception("Cannot update item", 400)
+        db.commit()
+        
+        # Return a success message
+        toast = render_template("___toast_success.html", message="Item updated")
+        return """<template>Item updated</template>
+        <template mix-target="#toast" mix-bottom>{toast}</template>
+        """
+    
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals(): db.rollback()
+        if isinstance(ex, x.CustomException):
+            return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            return "<template>Database error</template>", 500
+        return "<template>System under maintenance</template>", 500
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 
 
@@ -461,6 +552,68 @@ def create_item():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()    
+
+
+##############################
+@app.get("/items/<item_pk>/edit")
+def edit_item(item_pk):
+    try:
+        if not session.get("user"): return redirect(url_for("view_login"))
+        if not "restaurant" in session.get("user").get("roles"): return redirect(url_for("view_login"))
+        item_pk = x.validate_uuid4(item_pk)
+
+        db, cursor = x.db()
+        q = """
+            SELECT item_pk, item_title, item_description, item_price, item_image
+            FROM items
+            WHERE item_pk = %s
+        """
+        cursor.execute(q, (item_pk,))
+        item = cursor.fetchone()
+        if not item: return "item not found", 404
+        return render_template("view_edit_item.html", item=item, title="Edit Item", x=x)
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals(): db.rollback()
+        if isinstance(ex, x.CustomException): return ex.message, ex.code    
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            return "Database under maintenance", 500        
+        return "System under maintenance", 500  
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+##############################
+
+@app.post("/items/<item_pk>/delete")
+def delete_item(item_pk):
+    try:
+        if not session.get("user"): return redirect(url_for("view_login"))
+        if not "restaurant" in session.get("user").get("roles"): return redirect(url_for("view_login"))
+        item_pk = x.validate_uuid4(item_pk)
+        db, cursor = x.db()
+        q = 'DELETE FROM items WHERE item_pk = %s'
+        cursor.execute(q, (item_pk,))
+        if cursor.rowcount != 1: x.raise_custom_exception("cannot delete item", 400)
+        db.commit()
+        toast = render_template("___toast_success.html", message="item deleted")
+        return f"""
+        <template mix-target="#toast" mix-bottom>{toast}</template>
+        <template mix-redirect="/restaurant/items"></template>"""
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals(): db.rollback()
+        if isinstance(ex, x.CustomException): return ex.message, ex.code    
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            return "Database under maintenance", 500        
+        return "System under maintenance", 500  
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
+
 
 
 ##############################

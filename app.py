@@ -379,59 +379,6 @@ def login():
 
 ##############################
 
-@app.post("/items/<item_pk>/edit")
-@x.no_cache
-def update_item(item_pk):
-    try:
-        # Ensure the user is logged in
-        if not session.get("user", ""): 
-            return redirect(url_for("view_login"))
-        
-        # Ensure the user has the 'restaurant' role
-        if not "restaurant" in session.get("user").get("roles", ""):
-            return redirect(url_for("view_login"))
-        
-        # Validate the item title, description, and price
-        item_title = x.validate_item_title()
-        item_description = x.validate_item_description()
-        item_price = x.validate_item_price()
-        
-        # Validate the image
-        file, item_image_name = x.validate_item_image()
-        file.save(os.path.join(x.UPLOAD_ITEM_FOLDER, item_image_name))
-        if not item_image_name:
-            x.raise_custom_exception("Cannot save image", 500)
-        
-        # Update the item in the database
-        db, cursor = x.db()
-        q = """
-            UPDATE items
-            SET item_title = %s, item_description = %s, item_price = %s, item_image = %s
-            WHERE item_pk = %s
-        """
-        cursor.execute(q, (item_title, item_description, item_price, item_image_name, item_pk))
-        if cursor.rowcount != 1:
-            x.raise_custom_exception("Cannot update item", 400)
-        db.commit()
-        
-        # Return a success message
-        toast = render_template("___toast_success.html", message="Item updated")
-        return """<template>Item updated</template>
-        <template mix-target="#toast" mix-bottom>{toast}</template>
-        """
-    
-    except Exception as ex:
-        ic(ex)
-        if "db" in locals(): db.rollback()
-        if isinstance(ex, x.CustomException):
-            return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
-        if isinstance(ex, x.mysql.connector.Error):
-            ic(ex)
-            return "<template>Database error</template>", 500
-        return "<template>System under maintenance</template>", 500
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
 
 
 
@@ -585,32 +532,7 @@ def edit_item(item_pk):
         if "db" in locals(): db.close()
 ##############################
 
-@app.post("/items/<item_pk>/delete")
-def delete_item(item_pk):
-    try:
-        if not session.get("user"): return redirect(url_for("view_login"))
-        if not "restaurant" in session.get("user").get("roles"): return redirect(url_for("view_login"))
-        item_pk = x.validate_uuid4(item_pk)
-        db, cursor = x.db()
-        q = 'DELETE FROM items WHERE item_pk = %s'
-        cursor.execute(q, (item_pk,))
-        if cursor.rowcount != 1: x.raise_custom_exception("cannot delete item", 400)
-        db.commit()
-        toast = render_template("___toast_success.html", message="item deleted")
-        return f"""
-        <template mix-target="#toast" mix-bottom>{toast}</template>
-        <template mix-redirect="/restaurant/items"></template>"""
-    except Exception as ex:
-        ic(ex)
-        if "db" in locals(): db.rollback()
-        if isinstance(ex, x.CustomException): return ex.message, ex.code    
-        if isinstance(ex, x.mysql.connector.Error):
-            ic(ex)
-            return "Database under maintenance", 500        
-        return "System under maintenance", 500  
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
+
 
 
 
@@ -716,6 +638,63 @@ def user_unblock(user_pk):
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+##############################
+
+
+@app.put("/items/<item_pk>/edit")
+@x.no_cache
+def update_item(item_pk):
+    try:
+        # Ensure the user is logged in
+        if not session.get("user", ""): 
+            return redirect(url_for("view_login"))
+        
+        # Ensure the user has the 'restaurant' role
+        if not "restaurant" in session.get("user").get("roles", ""):
+            return redirect(url_for("view_login"))
+        
+        # Validate the item title, description, and price
+        item_title = x.validate_item_title()
+        item_description = x.validate_item_description()
+        item_price = x.validate_item_price()
+        
+        # Validate the image
+        file, item_image_name = x.validate_item_image()
+        file.save(os.path.join(x.UPLOAD_ITEM_FOLDER, item_image_name))
+        if not item_image_name:
+            x.raise_custom_exception("Cannot save image", 500)
+        
+        # Update the item in the database
+        db, cursor = x.db()
+        q = """
+            UPDATE items
+            SET item_title = %s, item_description = %s, item_price = %s, item_image = %s
+            WHERE item_pk = %s
+        """
+        cursor.execute(q, (item_title, item_description, item_price, item_image_name, item_pk))
+        if cursor.rowcount != 1:
+            x.raise_custom_exception("Cannot update item", 400)
+        db.commit()
+        
+        # Return a success message
+        toast = render_template("___toast_success.html", message="Item updated")
+        return f"""
+        <template mix-target="#toast" mix-bottom>{toast}</template>
+        """
+    
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals(): db.rollback()
+        if isinstance(ex, x.CustomException):
+            return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            return "<template>Database error</template>", 500
+        return "<template>System under maintenance</template>", 500
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
 
 
 
@@ -762,6 +741,34 @@ def user_delete(user_pk):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+##############################
+
+@app.delete("/items/<item_pk>/delete")
+def delete_item(item_pk):
+    try:
+        if not session.get("user"):
+            return redirect(url_for("view_login"))
+        if not "restaurant" in session.get("user").get("roles"): 
+            return redirect(url_for("view_login"))
+        item_pk = x.validate_uuid4(item_pk)
+        db, cursor = x.db()
+        q = 'DELETE FROM items WHERE item_pk = %s'
+        cursor.execute(q, (item_pk,))
+        if cursor.rowcount != 1: x.raise_custom_exception("cannot delete item", 400)
+        db.commit()
+        return f"""
+        <template mix-redirect="/restaurant/items"></template>"""
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals(): db.rollback()
+        if isinstance(ex, x.CustomException): return ex.message, ex.code    
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            return "Database under maintenance", 500        
+        return "System under maintenance", 500  
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 
 

@@ -193,11 +193,11 @@ def send_verify_email(to_email, user_verification_key):
 
 
         # Email and password of the sender's Gmail account
-        sender_email = "webdevjenner@gmail.com"
-        password = "crrn qrfi uusx cduj"  # If 2FA is on, use an App Password instead
+        sender_email = "wrathzeek@gmail.com"
+        password = "qxea cqda veji leia"  # If 2FA is on, use an App Password instead
 
         # Receiver email address
-        receiver_email = "webdevjenner@gmail.com"
+        receiver_email = "wrathzeek@gmail.com"
         
         # Create the email message
         message = MIMEMultipart()
@@ -233,11 +233,11 @@ def send_block_email(to_email, type_of_block):
 
 
         # Email and password of the sender's Gmail account
-        sender_email = "webdevjenner@gmail.com"
-        password = "crrn qrfi uusx cduj"  # If 2FA is on, use an App Password instead
+        sender_email = "wrathzeek@gmail.com"
+        password = "qxea cqda veji leia"  # If 2FA is on, use an App Password instead
 
         # Receiver email address
-        receiver_email = "webdevjenner@gmail.com"
+        receiver_email = "wrathzeek@gmail.com"
         
         # Create the email message
         message = MIMEMultipart()
@@ -262,5 +262,55 @@ def send_block_email(to_email, type_of_block):
         raise_custom_exception("cannot send email", 500)
     finally:
         pass
+
+
+##############################
+
+def send_deletion_email(to_email):
+    try:
+        # Configure your SMTP server settings
+        # Create a gmail fullflaskdemomail
+        # Enable (turn on) 2 step verification/factor in the google account manager
+        # Visit: https://myaccount.google.com/apppasswords
+
+
+        # Email and password of the sender's Gmail account
+        sender_email = "wrathzeek@gmail.com"
+        password = "qxea cqda veji leia"  # If 2FA is on, use an App Password instead
+
+        # Receiver email address
+        receiver_email = "wrathzeek@gmail.com"
+        
+        # Create the email message
+        message = MIMEMultipart()
+        message["From"] = "Wolt"
+        message["To"] = receiver_email
+        message["Subject"] = "Account deletion"
+
+        # Body of the email
+        body = f"""<p>Your account has been deleted</p>"""
+        message.attach(MIMEText(body, "html"))
+
+        # Connect to Gmail's SMTP server and send the email
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()  # Upgrade the connection to secure
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
+        print("Email sent successfully!")
+
+        return "email sent"
+
+    except Exception as ex:
+        raise_custom_exception("cannot send email", 500)
+    finally:
+        pass
+
+
+
+##############################
+
+
+
+
 
 

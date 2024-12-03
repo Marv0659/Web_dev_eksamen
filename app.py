@@ -215,6 +215,134 @@ def view_choose_role():
 
 
 
+##############################
+@app.get("/restaurant-profile")
+@x.no_cache
+def view_restaurant_profile():
+    try:
+        if not session.get("user", ""): 
+            return redirect(url_for("view_login"))
+        user = session.get("user")
+        if not "restaurant" in user.get("roles", ""):
+            return redirect(url_for("view_login"))
+        db, cursor = x.db()
+        query = """
+            SELECT user_name, user_email
+            FROM users
+            WHERE user_pk = %s
+        """
+        cursor.execute(query, (user.get("user_pk"),))
+        user = cursor.fetchone()
+        return render_template("view_restaurant_profile.html", user=user, title="Restaurant Profile", x=x)
+    except Exception as ex:
+        if "db" in locals():
+            db.rollback()
+        x.ic(ex)
+        
+        return "Error updating profile", 500
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+        
+
+
+@app.get("/restaurant-profile/edit")
+@x.no_cache
+def view_edit_restaurant_profile():
+    if not session.get("user", ""): 
+        return redirect(url_for("view_login"))
+    user = session.get("user")
+    if not "restaurant" in user.get("roles", ""):
+        return redirect(url_for("view_login"))
+    return render_template("view_edit_restaurant_profile.html", user=user, title="Edit Restaurant Profile", x=x)
+
+
+##############################
+@app.put("/profile/edit")
+def update_profile():
+    try:
+        user = session.get("user")
+        if not user:
+            x.raise_custom_exception("Please log in to edit your profile", 401)
+
+        user_pk = user.get("user_pk")
+
+        # Get form data
+        user_name = x.validate_user_name()
+        user_email = x.validate_user_email()
+        current_password = request.form.get("current_password", "")
+        new_password = request.form.get("new_password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+
+        db, cursor = x.db()
+        # Fetch current user data
+        cursor.execute("""
+            SELECT user_password, user_email, user_name
+            FROM users
+            WHERE user_pk = %s
+        """, (user_pk,))
+        user_data = cursor.fetchone()
+
+        if not user_data:
+            x.raise_custom_exception("User not found", 404)
+
+        # Validate and update email
+        if user_email != user_data['user_email']:
+            if not x.validate_email(user_email):
+                x.raise_custom_exception("Invalid email address", 400)
+            # Check if email is already taken
+            cursor.execute("SELECT user_pk FROM users WHERE user_email = %s", (user_email,))
+            if cursor.fetchone():
+                x.raise_custom_exception("Email is already in use", 400)
+
+        # Validate and update name
+
+        # Update password if provided
+        if new_password:
+            if not current_password:
+                x.raise_custom_exception("Current password is required to change your password", 400)
+            if not check_password_hash(user_data['user_password'], current_password):
+                x.raise_custom_exception("Current password is incorrect", 401)
+            if new_password != confirm_password:
+                x.raise_custom_exception("New passwords do not match", 400)
+            if not x.validate_new_user_password(new_password):
+                x.raise_custom_exception("Password does not meet requirements", 400)
+            new_password_hash = generate_password_hash(new_password)
+        else:
+            new_password_hash = user_data['user_password']  # Keep the old password
+
+        # Update user data in the database
+        cursor.execute("""
+            UPDATE users
+            SET user_name = %s, user_email = %s, user_password = %s
+            WHERE user_pk = %s
+        """, (user_name, user_email, new_password_hash, user_pk))
+        db.commit()
+
+        # Update session data
+        session['user']['user_name'] = user_name
+        session['user']['user_email'] = user_email
+
+        toast = render_template("___toast_success.html", message="Profile updated")
+        return f"""
+        <template mix-target="#toast" mix-bottom>{toast}</template>
+"""
+
+    except Exception as ex:
+        if "db" in locals():
+            db.rollback()
+        x.ic(ex)
+        
+        return "Error updating profile", 500
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
+
+
 
 
 ##############################
@@ -724,6 +852,7 @@ def user_delete(user_pk):
         cursor.execute(q, (user_deleted_at, user_pk))
         if cursor.rowcount != 1: x.raise_custom_exception("cannot delete user", 400)
         db.commit()
+        session.pop("user", None)
         return """<template>user deleted</template>"""
     
     except Exception as ex:
@@ -770,6 +899,39 @@ def delete_item(item_pk):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+##############################
+@app.delete("/restaurant-profile/delete")
+def delete_restaurant():
+    try:
+        if not session.get("user"):
+            return redirect(url_for("view_login"))
+        if not "restaurant" in session.get("user").get("roles"): 
+            return redirect(url_for("view_login"))
+        
+        user_pk = session.get("user").get("user_pk")
+        db, cursor = x.db()
+        q = 'DELETE FROM users WHERE user_pk = %s'
+        cursor.execute(q, (user_pk,))
+        if cursor.rowcount != 1:
+            x.raise_custom_exception("cannot delete restaurant", 400)
+        
+
+        db.commit()
+        session.pop("user", None)
+        return f"""
+        <template mix-redirect="/login"></template>
+"""
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals(): db.rollback()
+        if isinstance(ex, x.CustomException): return ex.message, ex.code    
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            return "Database under maintenance", 500        
+        return "System under maintenance", 500  
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 
 ##############################

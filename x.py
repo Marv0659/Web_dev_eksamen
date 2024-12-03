@@ -113,6 +113,15 @@ def validate_user_password():
     if not re.match(REGEX_USER_PASSWORD, user_password): raise_custom_exception(error, 400)
     return user_password
 
+USER_PASSWORD_MIN = 8
+USER_PASSWORD_MAX = 50
+REGEX_USER_PASSWORD = f"^.{{{USER_PASSWORD_MIN},{USER_PASSWORD_MAX}}}$"
+def validate_new_user_password(new_password):
+    error = f"password {USER_PASSWORD_MIN} to {USER_PASSWORD_MAX} characters"
+    user_password = request.form.get("user_password", "").strip()
+    if not re.match(REGEX_USER_PASSWORD, new_password): raise_custom_exception(error, 400)
+    return new_password
+
 ##############################
 ITEM_TITLE_MIN = 2
 ITEM_TITLE_MAX = 50

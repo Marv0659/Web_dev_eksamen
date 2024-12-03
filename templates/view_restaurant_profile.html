@@ -20,9 +20,12 @@
         <div class="profile-actions d-flex gap-2 mt-4">
             <a href="{{ url_for('view_edit_restaurant_profile') }}" class="btn">Edit Profile</a>
 
-            <button type="button" class="btn btn-danger" mix-delete="{{ url_for('delete_restaurant') }}">
-                Delete Profile
-            </button>
+            <form id="delete-btn">
+                <button type="button" class="btn btn-danger" mix-put="{{ url_for('delete_restaurant') }}"
+                    mix-data="#delete-btn">
+                    Delete Profile
+                </button>
+            </form>
         </div>
 
     </div>

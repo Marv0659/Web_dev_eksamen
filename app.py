@@ -65,8 +65,11 @@ def view_signup():
         if "customer" in session.get("user").get("roles"):
             return redirect(url_for("view_customer")) 
         if "partner" in session.get("user").get("roles"):
-            return redirect(url_for("view_partner"))         
+            return redirect(url_for("view_partner"))  
+        
+     
     return render_template("view_signup.html", x=x, title="Signup")
+
 
 
 ##############################
@@ -118,10 +121,14 @@ def view_login():
         if "customer" in session.get("user").get("roles"):
             return redirect(url_for("view_customer")) 
         if "partner" in session.get("user").get("roles"):
-            return redirect(url_for("view_partner"))    
-        if "restaurant" in session.get("user").get("roles"):
-            return redirect(url_for("view_restaurant_items"))
-    return render_template("view_login.html", x=x, title="Login", message=request.args.get("message", ""))
+            return redirect(url_for("view_partner"))
+
+    if session.get("new_user"):
+        message=session.get("new_user", "")  
+        session.pop("new_user")
+        return render_template("view_login.html", x=x, title="Login", message=message)
+    return render_template("view_login.html", x=x, title="Login")
+
 
 
 ##############################
@@ -144,19 +151,53 @@ def view_partner():
     user = session.get("user")
     if len(user.get("roles", "")) > 1:
         return redirect(url_for("view_choose_role"))
-    return response
+    return x
 
 
 ##############################
 @app.get("/admin")
 @x.no_cache
 def view_admin():
-    if not session.get("user", ""): 
-        return redirect(url_for("view_login"))
-    user = session.get("user")
-    if not "admin" in user.get("roles", ""):
-        return redirect(url_for("view_login"))
-    return render_template("view_admin.html")
+
+    try:
+        
+        if not session.get("user", ""): 
+            return redirect(url_for("view_login"))
+        user = session.get("user")
+        if not "admin" in user.get("roles", ""):
+            return redirect(url_for("view_login"))
+
+        db, cursor = x.db()
+        q = "SELECT * FROM users"
+        cursor.execute(q)
+
+        users = cursor.fetchall()
+
+        return render_template("view_admin.html", users=users)
+    
+    except Exception as ex:
+
+        ic(ex)
+        if "db" in locals(): db.rollback()
+
+        # My own exception
+        if isinstance(ex, x.CustomException):
+            return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
+        
+        # Database exception
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            if "users.user_email" in str(ex):
+                return """<template mix-target="#toast" mix-bottom>email not available</template>""", 400
+            return "<template>System upgrading</template>", 500  
+        
+        # Any other exception
+        return """<template mix-target="#toast" mix-bottom>System under maintenance</template>""", 500  
+    
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+    
 
 
 
@@ -351,14 +392,17 @@ def signup():
         
 
         x.send_verify_email(user_email, user_verification_key)
-        db.commit()
 
         q = "INSERT INTO users_roles VALUES(%s, %s)"
         cursor.execute(q,(user_pk, x.CUSTOMER_ROLE_PK))
     
         db.commit()
-        return """<template mix-redirect="/login"></template>""", 201
-    
+
+        session["new_user"] = "A verification email has been sent to you"
+        
+        return f"""
+        <template mix-redirect="/login"></template>
+        """, 201
     except Exception as ex:
         ic(ex)
         if "db" in locals(): db.rollback()
@@ -384,6 +428,7 @@ login = Blueprint("login", __name__)
 @app.post("/login")
 def login():
     try:
+
         # Detailed logging of input validation
         user_email = x.validate_user_email()
         user_password = x.validate_user_password()
@@ -410,7 +455,9 @@ def login():
         else:
             print("No user found with email:", user_email)
 
-        # Rest of your existing code...
+        if not rows[0]["user_verified_at"]:
+            toast = render_template("___toast.html", message="Please verify your account")
+            return f"""<template mix-target="#toast">{toast}</template>""", 400     
 
         if not rows:
             toast = render_template("___toast.html", message="user not registered")
@@ -649,9 +696,19 @@ def user_block(user_pk):
         db, cursor = x.db()
         q = 'UPDATE users SET user_blocked_at = %s WHERE user_pk = %s'
         cursor.execute(q, (user_blocked_at, user_pk))
+
+        q="SELECT * FROM users WHERE user_pk = %s"
+        cursor.execute(q, (user_pk,))
+
+        user=cursor.fetchone()
+
+        ic(user)
+
         if cursor.rowcount != 1: x.raise_custom_exception("cannot block user", 400)
+        x.send_block_email(user["user_email"], "Blocked")
         db.commit()
-        return """<template>user blocked</template>"""
+        unblock=render_template("___btn_unblock_user.html", user=user)
+        return f"""<template mix-target="#block-{user_pk}" mix-replace>{unblock}</template>"""
     
     except Exception as ex:
         ic(ex)
@@ -677,9 +734,16 @@ def user_unblock(user_pk):
         db, cursor = x.db()
         q = 'UPDATE users SET user_blocked_at = %s WHERE user_pk = %s'
         cursor.execute(q, (user_blocked_at, user_pk))
+
+        q="SELECT * FROM users WHERE user_pk = %s"
+        cursor.execute(q, (user_pk,))
+
+        user=cursor.fetchone()
         if cursor.rowcount != 1: x.raise_custom_exception("cannot unblock user", 400)
+        x.send_block_email(user["user_email"], "Unblocked")
         db.commit()
-        return """<template>user unblocked</template>"""
+        block=render_template("___btn_block_user.html", user=user)
+        return f"""<template mix-target="#unblock-{user_pk}" mix-replace>{block}</template>"""
     
     except Exception as ex:
 

@@ -40,8 +40,10 @@ try:
     # Drop tables if they exist
     cursor.execute("DROP TABLE IF EXISTS items")  # dependent table
     cursor.execute("DROP TABLE IF EXISTS users_roles")  # dependent table
+    cursor.execute("DROP TABLE IF EXISTS restaurant_food_category")  # dependent table
     cursor.execute("DROP TABLE IF EXISTS users")
     cursor.execute("DROP TABLE IF EXISTS roles")
+    cursor.execute("DROP TABLE IF EXISTS food_categories")
 
     ##############################
     # Create tables
@@ -93,6 +95,28 @@ try:
             FOREIGN KEY (user_role_role_fk) REFERENCES roles(role_pk) ON DELETE CASCADE ON UPDATE RESTRICT
         )
     """)
+
+    #############################    
+    q = """
+        CREATE TABLE food_categories (
+            food_category_pk CHAR(36),
+            food_category_name VARCHAR(50) NOT NULL UNIQUE,
+            PRIMARY KEY(food_category_pk)
+        );
+        """        
+    cursor.execute(q)
+
+#############################    
+    q = """
+        CREATE TABLE restaurant_food_category (
+            restaurant_food_category_food_category_fk CHAR(36),
+            restaurant_food_category_user_fk CHAR(36),
+            PRIMARY KEY(restaurant_food_category_food_category_fk, restaurant_food_category_user_fk)
+        );
+        """        
+    cursor.execute(q)
+    cursor.execute("ALTER TABLE restaurant_food_category ADD FOREIGN KEY (restaurant_food_category_food_category_fk) REFERENCES food_categories(food_category_pk) ON DELETE CASCADE ON UPDATE RESTRICT")
+    cursor.execute("ALTER TABLE restaurant_food_category ADD FOREIGN KEY (restaurant_food_category_user_fk) REFERENCES users(user_pk) ON DELETE CASCADE ON UPDATE RESTRICT")
 
     ##############################
     # Insert roles
@@ -191,6 +215,33 @@ try:
                 str(uuid.uuid4()), user["user_pk"], random.choice(dishes),
                 round(random.uniform(10, 100), 2), f"dish_{random.randint(1, 100)}.jpg"
             ))
+    
+     ##############################
+    # Create food categories
+    categories = ["Pizza", "Pasta", "Sushi", "Burger", "Salad"]
+    for category in categories:
+        cursor.execute("""
+        INSERT INTO food_categories (
+            food_category_pk, food_category_name)
+            VALUES (%s, %s)
+        """, (str(uuid.uuid4()), category))
+    
+    ##############################
+    
+    # Assign one food category to each restaurant user
+    cursor.execute("SELECT user_role_user_fk FROM users_roles WHERE user_role_role_fk = %s", (x.RESTAURANT_ROLE_PK,))
+    restaurant_users = cursor.fetchall()
+    # ic(restaurant_users)
+    cursor.execute("SELECT food_category_pk FROM food_categories")
+    food_categories = cursor.fetchall()
+    for restaurant_user in restaurant_users:
+        food_category = random.choice(food_categories)
+        cursor.execute("""
+        INSERT INTO restaurant_food_category (
+            restaurant_food_category_food_category_fk, restaurant_food_category_user_fk)
+            VALUES (%s, %s)
+        """, (food_category["food_category_pk"], restaurant_user["user_role_user_fk"]))
+
 
     ##############################
     db.commit()

@@ -305,7 +305,7 @@ def view_choose_role():
 
 ##############################
 @app.get("/<user_pk>/items")
-def view_restaurant_items(user_pk):
+def view_customer_restaurant_items(user_pk):
     # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
     random_image = request.args.get("image", default=None)
     db, cursor = x.db()
@@ -321,7 +321,7 @@ def view_restaurant_items(user_pk):
     cursor.close()
     db.close()
     user = session.get("user")
-    return render_template("view_restaurant_items.html", user=user, restaurant_items=restaurant_items, restaurant_user=restaurant_user, random_image=random_image)
+    return render_template("view_customer_restaurant_items.html", user=user, restaurant_items=restaurant_items, restaurant_user=restaurant_user, random_image=random_image)
 
 ##############################
 @app.get("/item/<item_pk>")

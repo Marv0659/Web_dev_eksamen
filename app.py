@@ -171,6 +171,22 @@ def view_restaurant_items(user_pk):
     return render_template("view_restaurant_items.html", user=user, restaurant_items=restaurant_items, restaurant_user=restaurant_user, random_image=random_image)
 
 ##############################
+@app.get("/item/<item_pk>")
+def view_item(item_pk):
+    # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
+    random_image = request.args.get("image", default=None)
+    db, cursor = x.db()
+    q = """ SELECT * FROM items 
+            WHERE item_pk = %s
+            """
+    cursor.execute(q, (item_pk,))
+    item = cursor.fetchone()
+    cursor.close()
+    db.close()
+    user = session.get("user")
+    return render_template("view_item.html", user=user, item=item, random_image=random_image)
+
+##############################
 @app.get("/restaurant/<food_category_pk>")
 def view_restaurant_by_category(food_category_pk):
     # make a variable that contains all users that has the role restaurant in the database and pass it to the template 

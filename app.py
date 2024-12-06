@@ -65,7 +65,13 @@ def view_index():
     cursor.close()
     db.close()
     user = session.get("user")
-    return render_template("view_index.html", user=user, restaurant_users=restaurant_users, food_categories=food_categories)
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+    return render_template("view_index.html", user=user, cart_price=cart_price, cart_count=cart_count, cart=cart, restaurant_users=restaurant_users, food_categories=food_categories)
 
 ##############################
 @app.get("/signup")
@@ -321,7 +327,13 @@ def view_customer_restaurant_items(user_pk):
     cursor.close()
     db.close()
     user = session.get("user")
-    return render_template("view_customer_restaurant_items.html", user=user, restaurant_items=restaurant_items, restaurant_user=restaurant_user, random_image=random_image)
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+    return render_template("view_customer_restaurant_items.html", user=user, cart_count=cart_count, cart_price=cart_price, restaurant_items=restaurant_items, restaurant_user=restaurant_user, random_image=random_image)
 
 ##############################
 @app.get("/item/<item_pk>")
@@ -333,11 +345,17 @@ def view_item(item_pk):
             WHERE item_pk = %s
             """
     cursor.execute(q, (item_pk,))
-    item = cursor.fetchone()
+    dish_item = cursor.fetchone()
     cursor.close()
     db.close()
     user = session.get("user")
-    return render_template("view_item.html", user=user, item=item, random_image=random_image)
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+    return render_template("view_item.html", user=user, dish_item=dish_item, cart=cart, cart_price=cart_price, random_image=random_image, cart_count=cart_count)
 
 
 ##############################
@@ -371,7 +389,7 @@ def view_restaurant_profile():
 
         
 
-
+##############################
 @app.get("/restaurant-profile/edit")
 @x.no_cache
 def view_edit_restaurant_profile():
@@ -384,8 +402,22 @@ def view_edit_restaurant_profile():
 
 
 ##############################
+@app.get("/checkout")
+def view_checkout():
+    user = session.get("user")
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+    if not user: 
+        return redirect(url_for("view_login"))
+    if not cart:
+        toast = render_template("___toast.html", message="Cart is empty")
+        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>"""
 
-
+    return render_template("view_checkout.html", user=user, title="Checkout", cart=cart, cart_price=cart_price, cart_count=cart_count)
 
 
 
@@ -411,7 +443,13 @@ def view_restaurant_by_category(food_category_pk):
     cursor.close()
     db.close()
     user = session.get("user")
-    return render_template("view_restaurant_by_category.html", user=user, restaurants=restaurants, food_category=food_category)
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+    return render_template("view_restaurant_by_category.html", user=user, cart_count=cart_count, cart_price=cart_price, restaurants=restaurants, food_category=food_category)
 ##############################
 ##############################
 ##############################
@@ -706,8 +744,34 @@ def create_item():
 ##############################
 
 ##############################
-
-
+@app.post("/set-item-cookie/<item_pk>")
+def set_item_cookie(item_pk):
+    try:
+        item_pk = x.validate_uuid4(item_pk)
+        db, cursor = x.db()
+        q = "SELECT * FROM items WHERE item_pk = %s"
+        cursor.execute(q, (item_pk,))
+        item = cursor.fetchone()
+        if 'cart' not in session:
+            # If not, create a new list with the current item
+            session['cart'] = [item]
+        else:
+            # If it exists, append the new item to the list
+            session['cart'].append(item)
+        cart = session.get("cart")
+        cart_count = len(cart) if cart else 0
+        cart_price = 0
+        if cart:
+            for item in cart:
+                cart_price += item["item_price"]
+        toast = render_template("___toast_success.html", message="Item added to cart")
+        cartBtn = render_template("__cart_button.html", cart_count=cart_count, cart_price=cart_price)
+        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>
+                   <template mix-target="#cartBtn" mix-replace>{cartBtn}</template>
+                    """
+    except Exception as ex:
+        ic(ex)
+        return "Error setting cookie", 500
 
 
 

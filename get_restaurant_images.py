@@ -10,13 +10,13 @@ headers = {
 
 # Search parameters
 search_params = {
-    "query": "food dishes",  # Keywords to find profile-style images
+    "query": "restaurants",  # Keywords to find profile-style images
     "per_page": 30,                # Max images per request
     "page": 1                      # Start on the first page
 }
 
 # Folder to save images
-save_folder = "dishes"
+save_folder = "restaurants"
 os.makedirs(save_folder, exist_ok=True)
 
 def download_image(image_url, save_path):
@@ -45,7 +45,7 @@ def get_profile_images(total_images=100):
                     break
 
                 img_url = img["urls"]["regular"]
-                img_name = f"dish_{images_downloaded + 1}.jpg"
+                img_name = f"restaurant_{images_downloaded + 1}.jpg"
                 save_path = os.path.join(save_folder, img_name)
                 download_image(img_url, save_path)
                 images_downloaded += 1

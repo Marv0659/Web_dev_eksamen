@@ -11,7 +11,7 @@ import os
 from icecream import ic
 ic.configureOutput(prefix=f'***** | ', includeContext=True)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 app.config['SESSION_TYPE'] = 'filesystem'  # or 'redis', etc.
 Session(app)
 
@@ -49,8 +49,23 @@ def view_test_get_redis():
 ##############################
 @app.get("/")
 def view_index():
-    name = "X"
-    return render_template("view_index.html", name=name)
+    # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
+    db, cursor = x.db()
+    q = """ SELECT * FROM users 
+            JOIN users_roles 
+            ON user_pk = user_role_user_fk 
+            JOIN roles
+            ON role_pk = user_role_role_fk
+            WHERE role_name = 'restaurant'"""
+    cursor.execute(q)
+    restaurant_users = cursor.fetchall()
+    q = """ SELECT * FROM food_categories"""
+    cursor.execute(q)
+    food_categories = cursor.fetchall()
+    cursor.close()
+    db.close()
+    user = session.get("user")
+    return render_template("view_index.html", user=user, restaurant_users=restaurant_users, food_categories=food_categories)
 
 ##############################
 @app.get("/signup")
@@ -151,7 +166,7 @@ def view_partner():
     user = session.get("user")
     if len(user.get("roles", "")) > 1:
         return redirect(url_for("view_choose_role"))
-    return x
+    return "x"
 
 
 ##############################
@@ -288,6 +303,41 @@ def view_choose_role():
     user = session.get("user")
     return render_template("view_choose_role.html", user=user, title="Choose role")
 
+##############################
+@app.get("/<user_pk>/items")
+def view_customer_restaurant_items(user_pk):
+    # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
+    random_image = request.args.get("image", default=None)
+    db, cursor = x.db()
+    q = """ SELECT * FROM items 
+            WHERE item_user_fk = %s
+            """
+
+    cursor.execute(q, (user_pk,))
+    restaurant_items = cursor.fetchall()
+    q = """ SELECT * FROM users WHERE user_pk = %s"""
+    cursor.execute(q, (user_pk,))
+    restaurant_user = cursor.fetchone()
+    cursor.close()
+    db.close()
+    user = session.get("user")
+    return render_template("view_customer_restaurant_items.html", user=user, restaurant_items=restaurant_items, restaurant_user=restaurant_user, random_image=random_image)
+
+##############################
+@app.get("/item/<item_pk>")
+def view_item(item_pk):
+    # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
+    random_image = request.args.get("image", default=None)
+    db, cursor = x.db()
+    q = """ SELECT * FROM items 
+            WHERE item_pk = %s
+            """
+    cursor.execute(q, (item_pk,))
+    item = cursor.fetchone()
+    cursor.close()
+    db.close()
+    user = session.get("user")
+    return render_template("view_item.html", user=user, item=item, random_image=random_image)
 
 
 ##############################
@@ -357,6 +407,27 @@ def confirm_delete_restaurant():
 
 
 
+##############################
+@app.get("/restaurant/<food_category_pk>")
+def view_restaurant_by_category(food_category_pk):
+    # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
+
+    db, cursor = x.db()
+    q = """ SELECT * FROM users
+            JOIN restaurant_food_category
+            ON user_pk = restaurant_food_category_user_fk
+            WHERE restaurant_food_category_food_category_fk = %s 
+            """
+
+    cursor.execute(q, (food_category_pk,))
+    restaurants = cursor.fetchall()
+    q = """ SELECT * FROM food_categories WHERE food_category_pk = %s"""
+    cursor.execute(q, (food_category_pk,))
+    food_category = cursor.fetchone()
+    cursor.close()
+    db.close()
+    user = session.get("user")
+    return render_template("view_restaurant_by_category.html", user=user, restaurants=restaurants, food_category=food_category)
 ##############################
 ##############################
 ##############################

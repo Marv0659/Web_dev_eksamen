@@ -137,6 +137,8 @@ def view_login():
             return redirect(url_for("view_customer")) 
         if "partner" in session.get("user").get("roles"):
             return redirect(url_for("view_partner"))
+        if "restaurant" in session.get("user").get("roles"):
+            return redirect(url_for("view_index"))
 
     if session.get("new_user"):
         message=session.get("new_user", "")  
@@ -338,6 +340,24 @@ def view_item(item_pk):
     db.close()
     user = session.get("user")
     return render_template("view_item.html", user=user, item=item, random_image=random_image)
+##############################
+
+@app.get("/forgot-password")
+def view_forgot_password():
+    return render_template("view_forgot_password.html", title="Forgot Password")
+
+##############################
+
+@app.get("/reset-password/<user_verification_key>")
+def view_reset_password(user_verification_key):
+    db, cursor = x.db()
+    q = "SELECT * FROM users WHERE user_verification_key = %s"
+    cursor.execute(q, (user_verification_key,))
+    user = cursor.fetchone()
+    if not user:
+        return "User not found", 404
+    return render_template("view_reset_password.html", user_verification_key=user_verification_key, title="Reset Password", x=x)
+
 
 
 ##############################
@@ -439,15 +459,72 @@ def _________POST_________(): pass
 ##############################
 
 @app.post("/logout")
+
 def logout():
     # ic("#"*30)
     # ic(session)
     session.pop("user", None)
+    session.clear()
     # session.clear()
     # session.modified = True
     # ic("*"*30)
     # ic(session)
     return redirect(url_for("view_login"))
+
+##############################
+@app.post("/reset-password/<user_verification_key>")
+def reset_password(user_verification_key):
+    try:
+        user_password = x.validate_user_password()
+        user_confirm_new_password = x.validate_user_confirm_new_password()
+        user_verification_key = x.validate_uuid4(user_verification_key)
+        hashed_password = generate_password_hash(user_password)
+
+        if user_password != user_confirm_new_password:
+            x.raise_custom_exception("passwords do not match", 400)
+
+
+        db, cursor = x.db()
+        q = "UPDATE users SET user_password = %s WHERE user_verification_key = %s"
+        cursor.execute(q, (hashed_password, user_verification_key))
+        if cursor.rowcount != 1: x.raise_custom_exception("cannot reset password", 400)
+        db.commit()
+        toast = render_template("___toast_success.html", message="password reset")
+        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>"""
+    
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals(): db.rollback()
+        toast = render_template("___toast.html", message="Error resetting password")
+        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
+
+
+##############################
+@app.post("/forgot-password/")
+def forgot_password():
+    try:
+        user_email = x.validate_user_email()
+        db, cursor = x.db()
+
+        q = "SELECT * FROM users WHERE user_email = %s"
+        cursor.execute(q, (user_email,))
+        user = cursor.fetchone()
+        if not user:
+            return "user not found", 404
+        x.send_forgot_password(user_email, user["user_verification_key"])
+        toast = render_template("___toast.html", message="email sent")
+        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>"""
+    except Exception as ex:
+        ic(ex)
+        return "error sending email", 500
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 
 ##############################

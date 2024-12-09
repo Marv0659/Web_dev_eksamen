@@ -2,41 +2,48 @@
 
 <main class="w-full px-5">
 
-    <ul>
-        <li><a href="/view_explore"></a></li>
-        <li><a href="/view_in"></a></li>
-    </ul>
-    
-<section class="my-10">
+    {% if user %}
+    <h1>Hej {{user.user_name}} {{user.user_last_name}}</h1>
+    {% endif %}
+    <h1>Welcome</h1>
+
+
+
+
     <h2>Categories</h2>
-    
+
     <ul class="d-flex gap-x-5 list-style-none mb-20">
         {% for category in food_categories %}
-    
-            <a href="/restaurant/{{category.food_category_pk}}" class="w-full h-40">
-                <div class="d-grid h-40 rows-1 cols-1 j-content-center p-relative rounded-5 ts-200" hover="shadow-md scale-102">
-                    <img src="{{ url_for('static', filename='categories/' + category.food_category_name + '.webp') }}" class="w-full h-40 obj-f-cover c-start-1 c-end-1 r-start-1 r-end-1 z-1 rounded-5" alt="image of {{category.food_category_name}}">
-                    <div class="h-40 w-full p-absolute bg-c-black bg-alpha-40 z-50 rounded-5"></div>
-                    <p class="c-start-1 c-end-1 r-start-1 r-end-1 j-self-center a-self-center text-c-white text-w-black z-100 text-xl">{{category.food_category_name}}</p>
-                </div>
-            </a>
-    
-        
+
+        <a href="/restaurant/{{category.food_category_pk}}" class="w-full h-40">
+            <div class="d-grid h-40 rows-1 cols-1 j-content-center p-relative rounded-5 ts-200"
+                hover="shadow-md scale-102">
+                <img src="{{ url_for('static', filename='categories/' + category.food_category_name + '.webp') }}"
+                    class="w-full h-40 obj-f-cover c-start-1 c-end-1 r-start-1 r-end-1 z-1 rounded-5"
+                    alt="image of {{category.food_category_name}}">
+                <div class="h-40 w-full p-absolute bg-c-black bg-alpha-40 z-50 rounded-5"></div>
+                <p
+                    class="c-start-1 c-end-1 r-start-1 r-end-1 j-self-center a-self-center text-c-white text-w-black z-100 text-xl">
+                    {{category.food_category_name}}</p>
+            </div>
+        </a>
+
+
         {% endfor %}
     </ul>
-</section>
- <h2>Resaurants</h2>
+    <h2>Restaurants</h2>
 
     <ul class="d-grid cols-12 gap-x-5 gap-y-15 list-style-none mb-20">
-        {% for restaurant in restaurant_users %}            
-            <a href="/{{restaurant.user_pk}}/items?image=dish_{{ loop.index|string }}" class="w-full h-full col-4">
-                <div class="shadow-xs w-full h-full rounded-2 ts-200" hover="shadow-md scale-102">
-                    <img src="{{ url_for('static', filename='dishes/dish_' + loop.index|string + '.jpg') }}" class="w-full h-40 obj-f-cover rounded-2" alt="">
-                    <p>{{restaurant.user_name}}</p>
-                </div>
-            </a>
+        {% for restaurant in restaurant_users %}
+        <a href="/{{restaurant.user_pk}}/items?image=dish_{{ loop.index|string }}" class="w-full h-full col-4">
+            <div class="shadow-xs w-full h-full rounded-2 ts-200" hover="shadow-md scale-102">
+                <img src="{{ url_for('static', filename='dishes/dish_' + loop.index|string + '.jpg') }}"
+                    class="w-full h-40 obj-f-cover rounded-2" alt="">
+                <p>{{restaurant.user_name}}</p>
+            </div>
+        </a>
         {% endfor %}
-</ul>
+    </ul>
 </main>
 
 

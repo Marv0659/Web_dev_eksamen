@@ -143,6 +143,8 @@ def view_login():
             return redirect(url_for("view_customer")) 
         if "partner" in session.get("user").get("roles"):
             return redirect(url_for("view_partner"))
+        if "restaurant" in session.get("user").get("roles"):
+            return redirect(url_for("view_index"))
 
     if session.get("new_user"):
         message=session.get("new_user", "")  
@@ -356,6 +358,24 @@ def view_item(item_pk):
         for item in cart:
             cart_price += item["item_price"]
     return render_template("view_item.html", user=user, dish_item=dish_item, cart=cart, cart_price=cart_price, random_image=random_image, cart_count=cart_count)
+##############################
+
+@app.get("/forgot-password")
+def view_forgot_password():
+    return render_template("view_forgot_password.html", title="Forgot Password")
+
+##############################
+
+@app.get("/reset-password/<user_verification_key>")
+def view_reset_password(user_verification_key):
+    db, cursor = x.db()
+    q = "SELECT * FROM users WHERE user_verification_key = %s"
+    cursor.execute(q, (user_verification_key,))
+    user = cursor.fetchone()
+    if not user:
+        return "User not found", 404
+    return render_template("view_reset_password.html", user_verification_key=user_verification_key, title="Reset Password", x=x)
+
 
 
 ##############################
@@ -417,7 +437,23 @@ def view_checkout():
         toast = render_template("___toast.html", message="Cart is empty")
         return f"""<template mix-target="#toast" mix-bottom>{toast}</template>"""
 
-    return render_template("view_checkout.html", user=user, title="Checkout", cart=cart, cart_price=cart_price, cart_count=cart_count)
+    return render_template("view_checkout.html", user=user, title="Checkout", cart=cart, cart_price=cart_price, cart_count=cart_count)@app.get("/restaurant-profile/delete")
+def confirm_delete_restaurant():
+    try:
+        if not session.get("user"):
+            return redirect(url_for("view_login"))
+        if not "restaurant" in session.get("user").get("roles"):
+            return redirect(url_for("view_login"))
+        return render_template("confirm_delete_profile.html", title="Delete Profile", x=x)
+    except Exception as ex:
+        ic(ex)
+        return redirect(url_for("view_index"))
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+##############################
+
 
 
 
@@ -461,15 +497,72 @@ def _________POST_________(): pass
 ##############################
 
 @app.post("/logout")
+
 def logout():
     # ic("#"*30)
     # ic(session)
     session.pop("user", None)
+    session.clear()
     # session.clear()
     # session.modified = True
     # ic("*"*30)
     # ic(session)
     return redirect(url_for("view_login"))
+
+##############################
+@app.post("/reset-password/<user_verification_key>")
+def reset_password(user_verification_key):
+    try:
+        user_password = x.validate_user_password()
+        user_confirm_new_password = x.validate_user_confirm_new_password()
+        user_verification_key = x.validate_uuid4(user_verification_key)
+        hashed_password = generate_password_hash(user_password)
+
+        if user_password != user_confirm_new_password:
+            x.raise_custom_exception("passwords do not match", 400)
+
+
+        db, cursor = x.db()
+        q = "UPDATE users SET user_password = %s WHERE user_verification_key = %s"
+        cursor.execute(q, (hashed_password, user_verification_key))
+        if cursor.rowcount != 1: x.raise_custom_exception("cannot reset password", 400)
+        db.commit()
+        toast = render_template("___toast_success.html", message="password reset")
+        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>"""
+    
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals(): db.rollback()
+        toast = render_template("___toast.html", message="Error resetting password")
+        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
+
+
+##############################
+@app.post("/forgot-password/")
+def forgot_password():
+    try:
+        user_email = x.validate_user_email()
+        db, cursor = x.db()
+
+        q = "SELECT * FROM users WHERE user_email = %s"
+        cursor.execute(q, (user_email,))
+        user = cursor.fetchone()
+        if not user:
+            return "user not found", 404
+        x.send_forgot_password(user_email, user["user_verification_key"])
+        toast = render_template("___toast.html", message="email sent")
+        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>"""
+    except Exception as ex:
+        ic(ex)
+        return "error sending email", 500
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 
 ##############################
@@ -895,6 +988,63 @@ def user_unblock(user_pk):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 ##############################
+@app.put("/restaurant-profile/delete")
+def delete_restaurant():
+    try:
+        if not session.get("user"):
+            return redirect(url_for("view_login"))
+        if not "restaurant" in session.get("user").get("roles"): 
+            return redirect(url_for("view_login"))
+        
+        user_pk = session.get("user").get("user_pk")
+        user_email = session.get("user").get("user_email")
+        
+        password = x.validate_user_password()
+
+        if not password:
+            x.raise_custom_exception("password is required", 400)
+
+
+        db, cursor = x.db()
+        cursor.execute("SELECT user_password FROM users WHERE user_pk = %s", (user_pk,))
+        user = cursor.fetchone()
+        if not user:
+            x.raise_custom_exception("user not found", 404)
+
+        if not check_password_hash(user["user_password"], password):
+            x.raise_custom_exception("invalid password", 401)
+        
+        user_deleted_at = int(time.time())
+        q = 'UPDATE users SET user_deleted_at = %s WHERE user_pk = %s'
+        cursor.execute(q, (user_deleted_at, user_pk))
+        if cursor.rowcount != 1:
+            x.raise_custom_exception("cannot delete restaurant", 400)
+        
+
+        db.commit()
+        x.send_deletion_email(user_email)
+        session.pop("user", None)
+        return f"""
+        <template mix-redirect="/login"></template>
+"""
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals(): db.rollback()
+        if isinstance(ex, x.CustomException): return ex.message, ex.code    
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            return "Database under maintenance", 500        
+        return "System under maintenance", 500  
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
+
+
+
+
+##############################
 
 
 @app.put("/items/<item_pk>/edit")
@@ -1112,39 +1262,7 @@ def delete_item(item_pk):
         if "db" in locals(): db.close()
 
 ##############################
-@app.put("/restaurant-profile/delete")
-def delete_restaurant():
-    try:
-        if not session.get("user"):
-            return redirect(url_for("view_login"))
-        if not "restaurant" in session.get("user").get("roles"): 
-            return redirect(url_for("view_login"))
-        
-        user_pk = session.get("user").get("user_pk")
-        user_deleted_at = int(time.time())
-        db, cursor = x.db()
-        q = 'UPDATE users SET user_deleted_at = %s WHERE user_pk = %s'
-        cursor.execute(q, (user_deleted_at, user_pk))
-        if cursor.rowcount != 1:
-            x.raise_custom_exception("cannot delete restaurant", 400)
-        
 
-        db.commit()
-        session.pop("user", None)
-        return f"""
-        <template mix-redirect="/login"></template>
-"""
-    except Exception as ex:
-        ic(ex)
-        if "db" in locals(): db.rollback()
-        if isinstance(ex, x.CustomException): return ex.message, ex.code    
-        if isinstance(ex, x.mysql.connector.Error):
-            ic(ex)
-            return "Database under maintenance", 500        
-        return "System under maintenance", 500  
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
 
 
 ##############################
@@ -1156,6 +1274,9 @@ def _________BRIDGE_________(): pass
 ##############################
 ##############################
 ##############################
+    
+
+
 
 
 ##############################

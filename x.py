@@ -112,7 +112,21 @@ def validate_user_password():
     user_password = request.form.get("user_password", "").strip()
     if not re.match(REGEX_USER_PASSWORD, user_password): raise_custom_exception(error, 400)
     return user_password
+##############################
+USER_USER_CONFIRM_NEWPASSWORD_MIN = 8
+USER_USER_CONFIRM_NEWPASSWORD_PASSWORD_MAX = 50
+REGEX_USER_CONFIRM_NEWPASSWORD__PASSWORD = f"^.{{{USER_USER_CONFIRM_NEWPASSWORD_MIN},{USER_USER_CONFIRM_NEWPASSWORD_PASSWORD_MAX}}}$"
+def validate_user_confirm_new_password():
+    error = f"password {USER_PASSWORD_MIN} to {USER_PASSWORD_MAX} characters"
+    user_confirm_new_password = request.form.get("user_confirm_new_password", "").strip()
+    if not re.match(REGEX_USER_CONFIRM_NEWPASSWORD__PASSWORD, user_confirm_new_password): raise_custom_exception(error, 400)
+    return user_confirm_new_password
 
+
+
+
+
+##############################
 USER_PASSWORD_MIN = 8
 USER_PASSWORD_MAX = 50
 REGEX_USER_PASSWORD = f"^.{{{USER_PASSWORD_MIN},{USER_PASSWORD_MAX}}}$"
@@ -193,11 +207,11 @@ def send_verify_email(to_email, user_verification_key):
 
 
         # Email and password of the sender's Gmail account
-        sender_email = "webdevjenner@gmail.com"
-        password = "crrn qrfi uusx cduj"  # If 2FA is on, use an App Password instead
+        sender_email = "wrathzeek@gmail.com"
+        password = "qxea cqda veji leia"  # If 2FA is on, use an App Password instead
 
         # Receiver email address
-        receiver_email = "webdevjenner@gmail.com"
+        receiver_email = "wrathzeek@gmail.com"
         
         # Create the email message
         message = MIMEMultipart()
@@ -233,11 +247,11 @@ def send_block_email(to_email, type_of_block):
 
 
         # Email and password of the sender's Gmail account
-        sender_email = "webdevjenner@gmail.com"
-        password = "crrn qrfi uusx cduj"  # If 2FA is on, use an App Password instead
+        sender_email = "wrathzeek@gmail.com"
+        password = "qxea cqda veji leia"  # If 2FA is on, use an App Password instead
 
         # Receiver email address
-        receiver_email = "webdevjenner@gmail.com"
+        receiver_email = "wrathzeek@gmail.com"
         
         # Create the email message
         message = MIMEMultipart()
@@ -262,5 +276,94 @@ def send_block_email(to_email, type_of_block):
         raise_custom_exception("cannot send email", 500)
     finally:
         pass
+
+
+##############################
+
+def send_deletion_email(to_email):
+    try:
+        # Configure your SMTP server settings
+        # Create a gmail fullflaskdemomail
+        # Enable (turn on) 2 step verification/factor in the google account manager
+        # Visit: https://myaccount.google.com/apppasswords
+
+
+        # Email and password of the sender's Gmail account
+        sender_email = "wrathzeek@gmail.com"
+        password = "qxea cqda veji leia"  # If 2FA is on, use an App Password instead
+
+        # Receiver email address
+        receiver_email = "wrathzeek@gmail.com"
+        
+        # Create the email message
+        message = MIMEMultipart()
+        message["From"] = "Wolt"
+        message["To"] = receiver_email
+        message["Subject"] = "Account deletion"
+
+        # Body of the email
+        body = f"""<p>Your account has been deleted</p>"""
+        message.attach(MIMEText(body, "html"))
+
+        # Connect to Gmail's SMTP server and send the email
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()  # Upgrade the connection to secure
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
+        print("Email sent successfully!")
+
+        return "email sent"
+
+    except Exception as ex:
+        raise_custom_exception("cannot send email", 500)
+    finally:
+        pass
+
+
+
+##############################
+def send_forgot_password(to_email, user_verification_key):
+    try:
+        # Configure your SMTP server settings
+        # Create a gmail fullflaskdemomail
+        # Enable (turn on) 2 step verification/factor in the google account manager
+        # Visit: https://myaccount.google.com/apppasswords
+
+
+        # Email and password of the sender's Gmail account
+        sender_email = "wrathzeek@gmail.com"
+        password = "qxea cqda veji leia"  # If 2FA is on, use an App Password instead
+
+        # Receiver email address
+        receiver_email = "wrathzeek@gmail.com"
+
+        message = MIMEMultipart()
+        message["From"] = "Wolt"
+        message["To"] = receiver_email
+        message["Subject"] = "Reset your password"
+
+        # Body of the email
+        body = f"""
+        <p>To reset your password, please <a href="http://127.0.0.1/reset-password/{user_verification_key}">click here</a></p>
+        """
+        message.attach(MIMEText(body, "html"))
+
+        # Connect to Gmail's SMTP server and send the email
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()  # Upgrade the connection to secure
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
+        print("Email sent successfully!")
+
+        return "email sent"
+
+    except Exception as ex:
+        raise_custom_exception("cannot send email", 500)
+    finally:
+        pass
+
+
+
+##############################
 
 

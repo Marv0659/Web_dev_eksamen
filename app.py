@@ -47,8 +47,8 @@ def view_test_get_redis():
     return name
 
 ##############################
-@app.get("/")
-def view_index():
+@app.get("/restaurants")
+def view_restaurants():
     # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
     db, cursor = x.db()
     q = """ SELECT * FROM users 
@@ -71,7 +71,31 @@ def view_index():
     if cart:
         for item in cart:
             cart_price += item["item_price"]
-    return render_template("view_index.html", user=user, cart_price=cart_price, cart_count=cart_count, cart=cart, restaurant_users=restaurant_users, food_categories=food_categories)
+    return render_template("view_restaurants.html", user=user, cart_price=cart_price, cart_count=cart_count, cart=cart, restaurant_users=restaurant_users, food_categories=food_categories)
+
+##############################
+@app.get("/explore")
+def view_explore():
+    # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
+    db, cursor = x.db()
+    q = """ SELECT * FROM users 
+            JOIN users_roles 
+            ON user_pk = user_role_user_fk 
+            JOIN roles
+            ON role_pk = user_role_role_fk
+            WHERE role_name = 'restaurant'"""
+    cursor.execute(q)
+    restaurant_users = cursor.fetchall()
+    cursor.close()
+    db.close()
+    user = session.get("user")
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+    return render_template("view_explore.html", user=user, cart_price=cart_price, cart_count=cart_count, cart=cart, restaurant_users=restaurant_users)
 
 ##############################
 @app.get("/signup")

@@ -7,7 +7,7 @@ import uuid
 import time
 import redis
 import os
-
+import random
 from icecream import ic
 ic.configureOutput(prefix=f'***** | ', includeContext=True)
 
@@ -180,8 +180,11 @@ def view_customer():
     if not session.get("user", ""): 
         return redirect(url_for("view_login"))
     user = session.get("user")
-    if len(user.get("roles", "")) > 1:
-        return redirect(url_for("view_choose_role"))
+    ic(user)
+    if "partner" in user["roles"]:
+        return redirect(url_for("view_partner"))
+    if "resturant" in user["roles"]:
+        return redirect(url_for("view_resturant"))
     return render_template("view_customer.html", user=user)
 
 ##############################
@@ -191,18 +194,16 @@ def view_partner():
     if not session.get("user", ""): 
         return redirect(url_for("view_login"))
     user = session.get("user")
-    if len(user.get("roles", "")) > 1:
+    if len(user.get("roles", "")) < 1:
         return redirect(url_for("view_choose_role"))
-    return "x"
+    return render_template("view_partner.html", user=user)
 
 
 ##############################
 @app.get("/admin")
 @x.no_cache
 def view_admin():
-
     try:
-        
         if not session.get("user", ""): 
             return redirect(url_for("view_login"))
         user = session.get("user")
@@ -210,12 +211,10 @@ def view_admin():
             return redirect(url_for("view_login"))
 
         db, cursor = x.db()
-        q = "SELECT * FROM users"
-        cursor.execute(q)
+        
 
-        users = cursor.fetchall()
-
-        return render_template("view_admin.html", users=users)
+        return render_template("view_admin.html")
+    
     
     except Exception as ex:
 
@@ -240,6 +239,122 @@ def view_admin():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
     
+
+##############################
+@app.get("/admin/users")
+def view_admin_users():
+
+        
+    try:
+        if not session.get("user", ""): 
+            return redirect(url_for("view_login"))
+        user = session.get("user")
+        if not "admin" in user.get("roles", ""):
+            return redirect(url_for("view_login"))
+
+        db, cursor = x.db()
+        
+        # Get search query from request
+        search_query = request.args.get('search', '').strip()
+        
+        if search_query:
+            # Modify query to include search functionality
+            q = """
+            SELECT * FROM users 
+            WHERE CONCAT(user_name, ' ', user_last_name) LIKE %s OR 
+            user_email LIKE %s
+            """
+            search_param = f'%{search_query}%'
+            cursor.execute(q, (search_param, search_param))
+        else:
+            # Original query if no search
+            q = "SELECT * FROM users"
+            cursor.execute(q)
+
+        users = cursor.fetchall()
+
+        return render_template("view_admin_users.html", users=users, search_query=search_query)
+    
+    
+    except Exception as ex:
+
+        ic(ex)
+        if "db" in locals(): db.rollback()
+
+        # My own exception
+        if isinstance(ex, x.CustomException):
+            return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
+        
+        # Database exception
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            if "users.user_email" in str(ex):
+                return """<template mix-target="#toast" mix-bottom>email not available</template>""", 400
+            return "<template>System upgrading</template>", 500  
+      
+        # Any other exception
+        return """<template mix-target="#toast" mix-bottom>System under maintenance</template>""", 500  
+    
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+##############################
+@app.get("/admin/items")
+def view_admin_items():        
+    try:
+        if not session.get("user", ""): 
+            return redirect(url_for("view_login"))
+        user = session.get("user")
+        if not "admin" in user.get("roles", ""):
+            return redirect(url_for("view_login"))
+
+        db, cursor = x.db()
+        
+        # Get search query from request
+        search_query = request.args.get('search', '').strip()
+        
+        if search_query:
+            # Modify query to include search functionality
+            q = """
+            SELECT * FROM items 
+            WHERE item_title LIKE %s 
+            """
+            search_param = f'%{search_query}%'
+            cursor.execute(q, (search_param, ))
+        else:
+            # Original query if no search
+            q = "SELECT * FROM items"
+            cursor.execute(q)
+
+        items = cursor.fetchall()
+
+        return render_template("view_admin_items.html", user=user, items=items, search_query=search_query)
+    
+    
+    except Exception as ex:
+
+        ic(ex)
+        if "db" in locals(): db.rollback()
+
+        # My own exception
+        if isinstance(ex, x.CustomException):
+            return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
+        
+        # Database exception
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            if "users.user_email" in str(ex):
+                return """<template mix-target="#toast" mix-bottom>email not available</template>""", 400
+            return "<template>System upgrading</template>", 500  
+      
+        # Any other exception
+        return """<template mix-target="#toast" mix-bottom>System under maintenance</template>""", 500  
+    
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
 
 
 
@@ -302,6 +417,18 @@ def view_restaurant_items():
         if "db" in locals(): db.close()
 
 
+##############################
+@app.get("/verify-partner")
+@x.no_cache
+def view_verify_partner():
+
+    user = session.get("user")
+    if not session.get("user", ""): 
+        return redirect(url_for("view_login"))
+    if "partner" in user["roles"]:
+        return redirect(url_for("view_login"))
+    return render_template("view_verify_partner.html", user=user)
+    
 
 
 
@@ -539,6 +666,111 @@ def _________POST_________(): pass
 ##############################
 ##############################
 
+##############################
+@app.post("/partner-verification/<user_pk>")
+def send_partner_verification(user_pk):
+    try:
+        
+        # VALIDATION
+        if not session.get("user", ""): 
+            return redirect(url_for("view_login"))
+
+        
+
+        user_password = x.validate_user_password()
+        
+
+        db, cursor = x.db()
+        q = """SELECT * FROM users
+            WHERE user_pk = %s 
+            """
+        cursor.execute(q, (user_pk,))
+
+        user = cursor.fetchone()
+
+        ic(user)
+
+        database_password = user["user_password"]
+
+        if not check_password_hash(database_password, user_password):
+            toast = render_template("___toast.html", message="incorrect password")
+            return f"""<template mix-target="#toast" mix-bottom>{toast}</template>"""
+
+        q = """INSERT INTO users_roles (user_role_user_fk, user_role_role_fk)
+            VALUES(%s, %s)
+            """
+        cursor.execute(q,(user["user_pk"], x.PARTNER_ROLE_PK))
+
+
+        q = """
+            SELECT * FROM users
+            JOIN users_roles ON user_pk = user_role_user_fk
+            JOIN roles ON role_pk = user_role_role_fk
+            WHERE LOWER(TRIM(user_email)) = LOWER(TRIM(%s))
+        """
+        cursor.execute(q, (user["user_email"],))
+        rows = cursor.fetchall()
+
+        print("Number of rows found:", len(rows))
+        if rows:
+            print("Found user details:", rows[0])
+        else:
+            print("No user found with email:", user["user_email"])
+        
+        roles = []
+
+        session.pop("user")
+
+        for row in rows:
+            roles.append(row["role_name"])
+        user = {
+            "user_pk": rows[0]["user_pk"],
+            "user_name": rows[0]["user_name"],
+            "user_last_name": rows[0]["user_last_name"],
+            "user_email": rows[0]["user_email"],
+            "user_avatar": rows[0]["user_avatar"],
+            "roles": roles
+        }
+        ic(user)
+
+        session["user"] = user
+
+        db.commit()
+
+        return """<template mix-redirect="/partner"></template>"""
+    
+    except Exception as ex:
+
+        ic(ex)
+        if "db" in locals(): db.rollback()
+
+        # My own exception
+        if isinstance(ex, x.CustomException):
+            toast = render_template("___toast.html", message=ex.message)
+            return f"""<template mix-target="#toast" mix-bottom>{toast}</template>""", ex.code
+        
+        # Database exception
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            if "users.user_email" in str(ex):
+                return """<template mix-target="#toast" mix-bottom>email not available</template>""", 400
+            return "<template>System upgrading</template>", 500  
+      
+        # Any other exception
+        return """<template mix-target="#toast" mix-bottom>System under maintenance</template>""", 500  
+    
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
+
+
+
+
+
+
+##############################
 @app.post("/logout")
 
 def logout():
@@ -620,7 +852,7 @@ def signup():
         hashed_password = generate_password_hash(user_password)
         
         user_pk = str(uuid.uuid4())
-        user_avatar = ""
+        user_avatar = "profile_" + str(random.randint(1, 100)) + ".jpg"
         user_created_at = int(time.time())
         user_deleted_at = 0
         user_blocked_at = 0
@@ -664,26 +896,18 @@ def signup():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-##############################
-
-login = Blueprint("login", __name__)
 
 ##############################
 @app.post("/login")
 def login():
     try:
 
-        # Detailed logging of input validation
         user_email = x.validate_user_email()
         user_password = x.validate_user_password()
 
 
-        print("Validated Email:", repr(user_email))  # Use repr to show exact string
-        print("Validated Password Length:", len(user_password))
-
         db, cursor = x.db()
 
-        # Modified query with more flexible matching
         q = """
             SELECT * FROM users
             JOIN users_roles ON user_pk = user_role_user_fk
@@ -718,6 +942,7 @@ def login():
             "user_name": rows[0]["user_name"],
             "user_last_name": rows[0]["user_last_name"],
             "user_email": rows[0]["user_email"],
+            "user_avatar": rows[0]["user_avatar"],
             "roles": roles
         }
         ic(user)
@@ -810,6 +1035,7 @@ def login():
 #     finally:
 #         if "cursor" in locals(): cursor.close()
 #         if "db" in locals(): db.close()
+
 
 
 ##############################
@@ -938,6 +1164,8 @@ def _________PUT_________(): pass
 ##############################
 ##############################
 
+##############################
+
 @app.put("/users")
 def user_update():
     try:
@@ -991,7 +1219,7 @@ def user_block(user_pk):
         ic(user)
 
         if cursor.rowcount != 1: x.raise_custom_exception("cannot block user", 400)
-        x.send_block_email(user["user_email"], "Blocked")
+        x.send_block_email(user["user_email"], "blocked", "account")
         db.commit()
         unblock=render_template("___btn_unblock_user.html", user=user)
         return f"""<template mix-target="#block-{user_pk}" mix-replace>{unblock}</template>"""
@@ -1011,6 +1239,65 @@ def user_block(user_pk):
 
 
 ##############################
+@app.put("/items/block/<item_pk>")
+def item_block(item_pk):
+    try:
+        if not "admin" in session.get("user").get("roles"):
+            return redirect(url_for("view_login"))
+        
+        item_pk = x.validate_uuid4(item_pk)
+        item_blocked_at = int(time.time())
+        
+        db, cursor = x.db()
+        
+        # Update the item as blocked
+        q = 'UPDATE items SET item_blocked_at = %s WHERE item_pk = %s'
+        cursor.execute(q, (item_blocked_at, item_pk))
+        
+        # Join items and users to get the user's email
+        q = '''
+        SELECT users.user_email 
+        FROM items 
+        JOIN users ON items.item_user_fk = users.user_pk 
+        WHERE items.item_pk = %s
+        '''
+        cursor.execute(q, (item_pk,))
+        
+        # Fetch the user's email
+        item_with_email = cursor.fetchone()
+        
+        # Verify the item exists and was blocked
+        if cursor.rowcount != 1:
+            x.raise_custom_exception("cannot block user", 400)
+        
+        x.send_block_email(item_with_email['user_email'], "blocked", "item")
+        
+        db.commit()
+        
+        unblock = render_template("___btn_unblock_item.html", item=item_with_email)
+        return f"""<template mix-target="#block-{item_pk}" mix-replace>{unblock}</template>"""
+    
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals():
+            db.rollback()
+        
+        if isinstance(ex, x.CustomException):
+            return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
+        
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            return "<template>Database error</template>", 500
+        
+        return "<template>System under maintenance</template>", 500
+    
+    finally:
+        if "cursor" in locals():
+            cursor.close()
+        if "db" in locals():
+            db.close()
+
+##############################
 @app.put("/users/unblock/<user_pk>")
 def user_unblock(user_pk):
     try:
@@ -1026,7 +1313,7 @@ def user_unblock(user_pk):
 
         user=cursor.fetchone()
         if cursor.rowcount != 1: x.raise_custom_exception("cannot unblock user", 400)
-        x.send_block_email(user["user_email"], "Unblocked")
+        x.send_block_email(user["user_email"], "unblocked", "account")
         db.commit()
         block=render_template("___btn_block_user.html", user=user)
         return f"""<template mix-target="#unblock-{user_pk}" mix-replace>{block}</template>"""
@@ -1045,6 +1332,8 @@ def user_unblock(user_pk):
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
+
 ##############################
 @app.put("/restaurant-profile/delete")
 def delete_restaurant():
@@ -1103,8 +1392,65 @@ def delete_restaurant():
 
 
 ##############################
+@app.put("/items/unblock/<item_pk>")
+def item_unblock(item_pk):
+    try:
+        if not "admin" in session.get("user").get("roles"): 
+            return redirect(url_for("view_login"))
+        
+        item_pk = x.validate_uuid4(item_pk)
+        item_blocked_at = 0
+        
+        db, cursor = x.db()
+        
+        # Update the item as unblocked
+        q = 'UPDATE items SET item_blocked_at = %s WHERE item_pk = %s'
+        cursor.execute(q, (item_blocked_at, item_pk))
+
+        # Query to get both item and user email
+        q = '''
+        SELECT items.*, users.user_email 
+        FROM items 
+        JOIN users ON items.item_user_fk = users.user_pk 
+        WHERE items.item_pk = %s
+        '''
+        cursor.execute(q, (item_pk,))
+
+        # Fetch the item and user details
+        item_with_email = cursor.fetchone()
+        
+        if cursor.rowcount != 1: 
+            x.raise_custom_exception("cannot unblock user", 400)
+        
+        x.send_block_email(item_with_email["user_email"], "unblocked", "item")
+        
+        db.commit()
+        
+        block = render_template("___btn_block_item.html", item=item_with_email)
+        return f"""<template mix-target="#unblock-{item_pk}" mix-replace>{block}</template>"""
+    
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals(): 
+            db.rollback()
+        
+        if isinstance(ex, x.CustomException): 
+            return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code        
+        
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            return "<template>Database error</template>", 500        
+        
+        return "<template>System under maintenance</template>", 500  
+    
+    finally:
+        if "cursor" in locals(): 
+            cursor.close()
+        if "db" in locals(): 
+            db.close()
 
 
+##############################
 @app.put("/items/<item_pk>/edit")
 @x.no_cache
 def update_item(item_pk):
@@ -1159,9 +1505,8 @@ def update_item(item_pk):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+
 ##############################
-
-
 
 @app.put("/profile/edit")
 def update_profile():

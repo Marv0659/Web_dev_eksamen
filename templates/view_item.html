@@ -8,7 +8,11 @@
             <h1>{{dish_item.item_title}}</h1>
             <h3>${{dish_item.item_price}}</h3>
         </div>
-      <button class="cursor-pointer" mix-post="/set-item-cookie/{{dish_item.item_pk}}" mix-data="#cart">BUY</button>
+        {% if user %}
+      <button class="cursor-pointer bg-c-blue:+1 pa-2 rounded-3 text-c-blue:+40 text-w-semibold" mix-post="/set-item-cookie/{{dish_item.item_pk}}" mix-data="#cart">BUY</button>
+        {% else %}
+        <a href="/login" class="cursor-pointer bg-c-blue:+1 pa-2 rounded-3 text-c-blue:+40 text-w-semibold">Login to buy</a>
+        {% endif %}
     </div>
 </div>
 </main>

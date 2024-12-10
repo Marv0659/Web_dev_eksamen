@@ -580,8 +580,7 @@ def view_checkout():
     if not user: 
         return redirect(url_for("view_login"))
     if not cart:
-        toast = render_template("___toast.html", message="Cart is empty")
-        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>"""
+        return redirect(url_for("view_restaurants"))
 
     return render_template("view_checkout.html", user=user, title="Checkout", cart=cart, cart_price=cart_price, cart_count=cart_count)
 
@@ -602,8 +601,19 @@ def confirm_delete_restaurant():
         if "db" in locals(): db.close()
 
 ##############################
-
-
+@app.get("/order-confirmed")
+def view_order_confirmed():
+    x.no_cache
+    user = session.get("user")
+    cart_items = session.get("cart")
+    if not cart_items:
+        return redirect(url_for("view_restaurants"))
+    session.pop("cart")
+    confirmed_template = render_template("view_order_confirmed.html", user=user, cart_items=cart_items, title="Order Confirmed")
+    toast = render_template("___toast_success.html", message="Order confirmed. An email has been sent to you")
+    return f"""<template mix-target="#checkoutBody" mix-replace>{confirmed_template}</template>
+                <template mix-target="#toast" mix-bottom>{toast}</template>
+                <template mix-target="#cartBtn" mix-replace></template>"""
 
 
 
@@ -1144,11 +1154,9 @@ def send_order_email(user_pk):
         q = "SELECT * FROM users WHERE user_pk = %s"
         cursor.execute(q, (user_pk,))
         user = cursor.fetchone()
-       
         toast = render_template("___toast_success.html", message="An email has been sent to you with your order details.")
         x.send_order_email()
-        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>
-                    """
+        return redirect(url_for("view_order_confirmed"))
     except Exception as ex:
         ic(ex)
         return "Error sending mail", 500

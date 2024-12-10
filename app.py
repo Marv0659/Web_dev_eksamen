@@ -441,7 +441,14 @@ def view_new_item():
     user = session.get("user")
     if not "restaurant" in user.get("roles", ""):
         return redirect(url_for("view_login"))
-    return render_template("view_create_item.html", user=user, title="New item", x=x)
+    user = session.get("user")
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+    return render_template("view_create_item.html", user=user, title="New item", x=x, cart_count=cart_count, cart_price=cart_price)
 
 
 
@@ -1084,66 +1091,78 @@ def login():
 
 ##############################
 @app.post("/items")
+@x.no_cache
 def create_item():
     try:
-
-        # check if user has the role restaurant
-        if not session.get("user"): 
-            return redirect(url_for("view_login"))
-        if not "restaurant" in session.get("user").get("roles"): 
+        # Ensure the user is logged in
+        if not session.get("user"):
             return redirect(url_for("view_login"))
 
+        # Ensure the user has the 'restaurant' role
+        user_roles = session.get("user").get("roles", [])
+        if "restaurant" not in user_roles:
+            return redirect(url_for("view_login"))
 
-        # TODO: validate item_title, item_description, item_price
+        # Validate textual fields using functions from x.py
         item_title = x.validate_item_title()
         item_description = x.validate_item_description()
         item_price = x.validate_item_price()
-        file, item_image_name = x.validate_item_image()
 
-        # Save the image
-        file.save(os.path.join(x.UPLOAD_ITEM_FOLDER, item_image_name))
-        # TODO: if saving the image went wrong, then rollback by going to the exception
-        if not item_image_name:
-            x.raise_custom_exception("cannot save image", 500)
-        
+        # Handle multiple images
+        files = request.files.getlist("item_file")
 
+        if len(files) < 1:
+            x.raise_custom_exception("At least one image is required", 400)
+        if len(files) > 3:
+            x.raise_custom_exception("You can upload a maximum of 3 images", 400)
 
-        item_pk = str(uuid.uuid4())
-        item_user_fk = session.get("user").get("user_pk")
-        
+        image_filenames = []
+        for file in files:
+            # Validate the file using x.validate_item_image()
+            validated_filename = x.validate_item_image(file)
+            # Save the image
+            file.save(os.path.join(x.UPLOAD_ITEM_FOLDER, validated_filename))
+            image_filenames.append(validated_filename)
 
+        # Join the filenames into a comma-separated string for storing in a single column
+        item_image_field = ",".join(image_filenames)
+
+        # Insert the new item into the database
         db, cursor = x.db()
+        item_pk = str(uuid.uuid4())
+        user_pk = session.get("user").get("user_pk")
 
         q = """
-            INSERT INTO items (item_pk, item_user_fk, item_title, item_description, item_price, item_image)
+            INSERT INTO items (item_pk, item_user_fk, item_title, item_price, item_description, item_image)
             VALUES (%s, %s, %s, %s, %s, %s)
         """
-
-        cursor.execute(q, (item_pk, item_user_fk, item_title, item_description, item_price, item_image_name))
+        cursor.execute(q, (item_pk, user_pk, item_title, item_price, item_description, item_image_field))
         db.commit()
-        toast = render_template("___toast_success.html", message="item created")
 
-
-        # TODO: Success, commit
-
-        return f"""<template>item created</template>
+        # Return success message
+        toast = render_template("___toast_success.html", message="Item created")
+        return f"""
         <template mix-target="#toast" mix-bottom>{toast}</template>
+        """
         
-        
-        """, 201
     except Exception as ex:
         ic(ex)
-        if "db" in locals(): db.rollback()
-        if isinstance(ex, x.CustomException): 
+        if "db" in locals():
+            db.rollback()
+        if isinstance(ex, x.CustomException):
+            # Return error message as a toast
             toast = render_template("___toast.html", message=ex.message)
             return f"""<template mix-target="#toast" mix-bottom>{toast}</template>""", ex.code    
         if isinstance(ex, x.mysql.connector.Error):
             ic(ex)
-            return "<template>System upgrating</template>", 500        
+            return "<template>Database error</template>", 500        
         return "<template>System under maintenance</template>", 500  
     finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()    
+        if "cursor" in locals():
+            cursor.close()
+        if "db" in locals():
+            db.close()
+ 
 
 
 ##############################
@@ -1498,11 +1517,11 @@ def item_unblock(item_pk):
 def update_item(item_pk):
     try:
         # Ensure the user is logged in
-        if not session.get("user", ""): 
+        if not session.get("user", ""):
             return redirect(url_for("view_login"))
         
         # Ensure the user has the 'restaurant' role
-        if not "restaurant" in session.get("user").get("roles", ""):
+        if not "restaurant" in session.get("user").get("roles", []):
             return redirect(url_for("view_login"))
         
         # Validate the item title, description, and price
@@ -1510,25 +1529,39 @@ def update_item(item_pk):
         item_description = x.validate_item_description()
         item_price = x.validate_item_price()
         
-        # Validate the image
-        file, item_image_name = x.validate_item_image()
-        file.save(os.path.join(x.UPLOAD_ITEM_FOLDER, item_image_name))
-        if not item_image_name:
-            x.raise_custom_exception("Cannot save image", 500)
+        # Get the list of files
+        files = request.files.getlist("item_file")
+        if len(files) < 1:
+            x.raise_custom_exception("At least one image is required", 400)
+        if len(files) > 3:
+            x.raise_custom_exception("You can upload a maximum of 3 images", 400)
+
         
-        # Update the item in the database
+        image_details = x.validate_item_image()  # returns a list of (file, filename)
+
+        image_filenames = []
+        for file, filename in image_details:
+            file.save(os.path.join(x.UPLOAD_ITEM_FOLDER, filename))
+            image_filenames.append(filename)
+
+# Join filenames as comma-separated or handle as needed
+        image_field_value = ",".join(image_filenames)
+
+# Update the database with image_field_value
+
+        
+        
         db, cursor = x.db()
         q = """
             UPDATE items
             SET item_title = %s, item_description = %s, item_price = %s, item_image = %s
             WHERE item_pk = %s
         """
-        cursor.execute(q, (item_title, item_description, item_price, item_image_name, item_pk))
+        cursor.execute(q, (item_title, item_description, item_price, item_image_field, item_pk))
         if cursor.rowcount != 1:
             x.raise_custom_exception("Cannot update item", 400)
         db.commit()
         
-        # Return a success message
         toast = render_template("___toast_success.html", message="Item updated")
         return f"""
         <template mix-target="#toast" mix-bottom>{toast}</template>
@@ -1546,6 +1579,7 @@ def update_item(item_pk):
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 
 ##############################

@@ -1,4 +1,4 @@
-from flask import Flask, session, render_template, redirect, url_for, make_response, request, Blueprint
+from flask import Flask, session, render_template, redirect, url_for, make_response, request, Blueprint, jsonify
 from flask_session import Session
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
@@ -51,12 +51,7 @@ def view_test_get_redis():
 def view_restaurants():
     # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
     db, cursor = x.db()
-    q = """ SELECT * FROM users 
-            JOIN users_roles 
-            ON user_pk = user_role_user_fk 
-            JOIN roles
-            ON role_pk = user_role_role_fk
-            WHERE role_name = 'restaurant'"""
+    q = """ SELECT * FROM restaurant_info """
     cursor.execute(q)
     restaurant_users = cursor.fetchall()
     q = """ SELECT * FROM food_categories"""
@@ -347,7 +342,7 @@ def view_customer_restaurant_items(user_pk):
 
     cursor.execute(q, (user_pk,))
     restaurant_items = cursor.fetchall()
-    q = """ SELECT * FROM users WHERE user_pk = %s"""
+    q = """ SELECT * FROM restaurant_info WHERE restaurant_info_user_fk = %s"""
     cursor.execute(q, (user_pk,))
     restaurant_user = cursor.fetchone()
     cursor.close()
@@ -461,7 +456,10 @@ def view_checkout():
         toast = render_template("___toast.html", message="Cart is empty")
         return f"""<template mix-target="#toast" mix-bottom>{toast}</template>"""
 
-    return render_template("view_checkout.html", user=user, title="Checkout", cart=cart, cart_price=cart_price, cart_count=cart_count)@app.get("/restaurant-profile/delete")
+    return render_template("view_checkout.html", user=user, title="Checkout", cart=cart, cart_price=cart_price, cart_count=cart_count)
+
+##############################
+@app.get("/restaurant-profile/delete")
 def confirm_delete_restaurant():
     try:
         if not session.get("user"):
@@ -510,6 +508,27 @@ def view_restaurant_by_category(food_category_pk):
         for item in cart:
             cart_price += item["item_price"]
     return render_template("view_restaurant_by_category.html", user=user, cart_count=cart_count, cart_price=cart_price, restaurants=restaurants, food_category=food_category)
+
+
+
+##############################
+
+##############################API_GET_ROUTE##############################
+@app.get("/fetch-restaurants")
+def fetch_restaurants():
+    db, cursor = x.db()
+    q = """ SELECT * FROM restaurant_info """
+    cursor.execute(q)
+    restaurants = cursor.fetchall()
+    cursor.close()
+    db.close()
+
+    # Return restaurants in JSON format
+    return jsonify(restaurants)
+
+
+
+
 ##############################
 ##############################
 ##############################
@@ -608,7 +627,6 @@ def signup():
         user_updated_at = 0
         user_verified_at = 0
         user_verification_key = str(uuid.uuid4())
-
         db, cursor = x.db()
         q = 'INSERT INTO users VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
         cursor.execute(q, (user_pk, user_name, user_last_name, user_email, 
@@ -891,7 +909,23 @@ def set_item_cookie(item_pk):
         return "Error setting cookie", 500
 
 
-
+##############################
+@app.post("/pay-now/<user_pk>")
+def send_order_email(user_pk):
+    try:
+        user_pk = x.validate_uuid4(user_pk)
+        db, cursor = x.db()
+        q = "SELECT * FROM users WHERE user_pk = %s"
+        cursor.execute(q, (user_pk,))
+        user = cursor.fetchone()
+       
+        toast = render_template("___toast_success.html", message="An email has been sent to you with your order details.")
+        x.send_order_email()
+        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>
+                    """
+    except Exception as ex:
+        ic(ex)
+        return "Error sending mail", 500
 
 
 ##############################

@@ -10,7 +10,7 @@
                 <p class="">(Taxes included)</p>
             </div>
             <p><span class="text-w-bold">Item total price:</span> ${{cart_price}}</p>
-            <button class="bg-c-black:+10  w-full text-c-white:-10 ma-auto text-150 text-w-semibold cursor-pointer">Pay now</button>
+            <form id="payBtn"><button class="bg-c-black:+10  w-full text-c-white:-10 ma-auto text-150 text-w-semibold cursor-pointer" mix-post="/pay-now/{{user.user_pk}}" mix-data="#payBtn">Pay now</button></form>
         </div>
     </div>
 
@@ -24,7 +24,7 @@
 
            <div>
                <p>{{item.item_title}}</p>
-               <p>{{item.item_price}}</p>
+               <p>${{item.item_price}}</p>
            </div>
            
        </div>

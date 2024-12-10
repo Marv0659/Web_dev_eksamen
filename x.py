@@ -239,6 +239,45 @@ def send_verify_email(to_email, user_verification_key):
 
 
 ##############################
+def send_order_email():
+    try:
+        # Create a gmail fullflaskdemomail
+        # Enable (turn on) 2 step verification/factor in the google account manager
+        # Visit: https://myaccount.google.com/apppasswords
+
+
+        # Email and password of the sender's Gmail account
+        sender_email = "webdevjenner@gmail.com"
+        password = "crrn qrfi uusx cduj"  # If 2FA is on, use an App Password instead
+
+        # Receiver email address
+        receiver_email = "magnusmadsen2000@hotmail.com"
+        
+        # Create the email message
+        message = MIMEMultipart()
+        message["From"] = "My company name"
+        message["To"] = receiver_email
+        message["Subject"] = "WWWolt order details"
+
+        # Body of the email
+        body = f"""Your order details: 1x burger, 1x fries, 1x coke"""
+        message.attach(MIMEText(body, "html"))
+
+        # Connect to Gmail's SMTP server and send the email
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()  # Upgrade the connection to secure
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
+        print("Email sent successfully!")
+        
+        return "email sent"
+       
+    except Exception as ex:
+        raise_custom_exception("cannot send email", 500)
+    finally:
+        pass
+
+##############################
 def send_block_email(to_email, type_of_block):
     try:
         # Create a gmail fullflaskdemomail

@@ -38,6 +38,7 @@ def insert_user_with_role(user, role_pk):
 try:
     ##############################
     # Drop tables if they exist
+    cursor.execute("DROP TABLE IF EXISTS restaurant_info")  # dependent table
     cursor.execute("DROP TABLE IF EXISTS items")  # dependent table
     cursor.execute("DROP TABLE IF EXISTS users_roles")  # dependent table
     cursor.execute("DROP TABLE IF EXISTS restaurant_food_category")  # dependent table
@@ -117,6 +118,28 @@ try:
     cursor.execute(q)
     cursor.execute("ALTER TABLE restaurant_food_category ADD FOREIGN KEY (restaurant_food_category_food_category_fk) REFERENCES food_categories(food_category_pk) ON DELETE CASCADE ON UPDATE RESTRICT")
     cursor.execute("ALTER TABLE restaurant_food_category ADD FOREIGN KEY (restaurant_food_category_user_fk) REFERENCES users(user_pk) ON DELETE CASCADE ON UPDATE RESTRICT")
+    #############################
+    q = """
+        CREATE TABLE restaurant_info (
+            restaurant_info_pk CHAR(36),
+            restaurant_info_user_fk CHAR(36),
+            restaurant_info_restaurant_name VARCHAR(50) NOT NULL,
+            restaurant_info_restaurant_address VARCHAR(100) NOT NULL,
+            restaurant_info_longitude DECIMAL(10, 8) NOT NULL,
+            restaurant_info_latitude DECIMAL(10, 8) NOT NULL,
+            restaurant_info_restaurant_phone VARCHAR(50) NOT NULL,
+            restaurant_info_restaurant_image VARCHAR(50),
+            restaurant_info_created_at INTEGER UNSIGNED,
+            restaurant_info_updated_at INTEGER UNSIGNED,
+            PRIMARY KEY(restaurant_info_pk, restaurant_info_user_fk)
+        );
+        """
+    cursor.execute(q)
+    cursor.execute("ALTER TABLE restaurant_info ADD FOREIGN KEY (restaurant_info_user_fk) REFERENCES users(user_pk) ON DELETE CASCADE ON UPDATE RESTRICT")
+
+
+
+
 
     ##############################
     # Insert roles
@@ -241,6 +264,23 @@ try:
             restaurant_food_category_food_category_fk, restaurant_food_category_user_fk)
             VALUES (%s, %s)
         """, (food_category["food_category_pk"], restaurant_user["user_role_user_fk"]))
+
+
+    ##############################
+    # insert into restaurant_info
+    copenhagen_lat_range = (55.61, 55.73)
+    copenhagen_long_range = (12.48, 12.60)
+    cursor.execute("SELECT user_pk FROM users WHERE user_pk IN (SELECT restaurant_food_category_user_fk FROM restaurant_food_category)")
+    restaurant_users = cursor.fetchall()
+    for restaurant_user in restaurant_users:
+        cursor.execute("""
+        INSERT INTO restaurant_info (
+            restaurant_info_pk, restaurant_info_user_fk, restaurant_info_restaurant_name, restaurant_info_restaurant_address, restaurant_info_longitude, restaurant_info_latitude, restaurant_info_restaurant_phone, restaurant_info_restaurant_image, restaurant_info_created_at, restaurant_info_updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (str(uuid.uuid4()), restaurant_user["user_pk"], fake.company(), fake.address(), random.uniform(*copenhagen_long_range), random.uniform(*copenhagen_lat_range), fake.phone_number(),f"dish_{random.randint(1, 100)}.jpg", int(time.time()), 0))
+
+
+
 
 
     ##############################

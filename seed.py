@@ -71,6 +71,7 @@ try:
             item_price DECIMAL(5,2) NOT NULL,
             item_description VARCHAR(500),
             item_image VARCHAR(50),
+            item_blocked_at INTEGER UNSIGNED,
             PRIMARY KEY(item_pk),
             FOREIGN KEY (item_user_fk) REFERENCES users(user_pk) ON DELETE CASCADE ON UPDATE RESTRICT
         )
@@ -185,11 +186,11 @@ try:
 
         for _ in range(random.randint(5, 15)):
             cursor.execute("""
-                INSERT INTO items (item_pk, item_user_fk, item_title, item_price, item_image)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO items (item_pk, item_user_fk, item_title, item_price, item_image, item_blocked_at)
+                VALUES (%s, %s, %s, %s, %s, %s)
             """, (
                 str(uuid.uuid4()), user["user_pk"], random.choice(dishes),
-                round(random.uniform(10, 100), 2), f"dish_{random.randint(1, 100)}.jpg"
+                round(random.uniform(10, 100), 2), f"dish_{random.randint(1, 100)}.jpg", 0
             ))
 
     ##############################

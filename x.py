@@ -239,7 +239,7 @@ def send_verify_email(to_email, user_verification_key):
 
 
 ##############################
-def send_order_email(, item_or_user):
+def send_order_email():
     try:
         # Create a gmail fullflaskdemomail
         # Enable (turn on) 2 step verification/factor in the google account manager

@@ -8,9 +8,9 @@
 
 <ul class="d-grid gap-x-5 gap-y-15 cols-12 list-style-none mt-20 ">
     {% for restaurant in restaurants %}
-    <a href="/{{restaurant.user_pk}}/items?image=dish_{{ loop.index|string }}" class="w-full h-40 col-3">
-        <img src="{{ url_for('static', filename='dishes/dish_' + loop.index|string + '.jpg') }}" class="w-full h-full obj-f-cover" alt="image of {{restaurant.user_name}}">
-        <p> {{restaurant.user_name}}</p>
+    <a href="/{{restaurant.restaurant_info_user_fk}}/items" class="w-full h-40 col-3">
+        <img src="{{ url_for('static', filename='dishes/'+ restaurant.restaurant_info_restaurant_image) }}" class="w-full h-full obj-f-cover" alt="image of {{restaurant.restaurant_info_restaurant_name}}">
+        <p> {{restaurant.restaurant_info_restaurant_name}}</p>
     </a>
     
     {% endfor %}

@@ -614,9 +614,9 @@ def view_restaurant_by_category(food_category_pk):
     # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
 
     db, cursor = x.db()
-    q = """ SELECT * FROM users
+    q = """ SELECT * FROM restaurant_info
             JOIN restaurant_food_category
-            ON user_pk = restaurant_food_category_user_fk
+            ON restaurant_info_user_fk = restaurant_food_category_user_fk
             WHERE restaurant_food_category_food_category_fk = %s 
             """
 

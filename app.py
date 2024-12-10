@@ -649,6 +649,40 @@ def view_restaurant_by_category(food_category_pk):
 
 
 ##############################
+@app.get("/view-all")
+def view_all():
+    search_query = request.args.get('search', '').strip()
+    db, cursor = x.db()
+    if search_query:
+        # Modify query to include search functionality
+        q = """
+        SELECT * FROM restaurant_info 
+        WHERE restaurant_info_restaurant_name LIKE %s
+        """
+        search_param = f'%{search_query}%'
+        cursor.execute(q, (search_param,))
+        restaurants = cursor.fetchall()
+        q = """
+        SELECT * FROM items 
+        WHERE item_title LIKE %s
+        """
+        search_param = f'%{search_query}%'
+        cursor.execute(q, (search_param,))
+        items = cursor.fetchall()
+    
+    else:
+        # Original query if no search
+        q = "SELECT * FROM restaurant_info"
+        cursor.execute(q)
+        restaurants = cursor.fetchall()
+        q = "SELECT * FROM items"
+        cursor.execute(q)
+        items = cursor.fetchall()
+
+
+    
+    return render_template("view_all.html", search_query=search_query, items=items, restaurants=restaurants)
+##############################
 
 ##############################API_GET_ROUTE##############################
 @app.get("/fetch-restaurants")

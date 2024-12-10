@@ -185,7 +185,14 @@ def view_customer():
         return redirect(url_for("view_partner"))
     if "resturant" in user["roles"]:
         return redirect(url_for("view_resturant"))
-    return render_template("view_customer.html", user=user)
+    
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+    return render_template("view_customer.html", user=user, cart_count = cart_count, cart_price = cart_price)
 
 ##############################
 @app.get("/partner")
@@ -422,14 +429,24 @@ def view_restaurant_items():
 @x.no_cache
 def view_verify_partner():
 
-    user = session.get("user")
     if not session.get("user", ""): 
         return redirect(url_for("view_login"))
+    user = session.get("user")
     if "partner" in user["roles"]:
         return redirect(url_for("view_login"))
     return render_template("view_verify_partner.html", user=user)
     
 
+##############################
+@app.get("/create-resturant")
+@x.no_cache
+def view_create_resturant():
+    if not session.get("user", ""):
+        return redirect(url_for("view_login"))
+    user = session.get("user")
+    if "resturant" or "partner" in user["roles"]:
+        return redirect(url_for("view_login"))
+    return render_template("view_create_resturant.html", user=user)
 
 
 ##############################

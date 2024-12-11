@@ -46,6 +46,19 @@ def view_test_get_redis():
     if not name: name = "no name"
     return name
 
+
+##############################
+@app.get("/")
+def view_index():
+    user = session.get("user")
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+    return render_template("view_index.html", user=user, cart_count=cart_count, cart_price=cart_price)
+
 ##############################
 @app.get("/restaurants")
 def view_restaurants():

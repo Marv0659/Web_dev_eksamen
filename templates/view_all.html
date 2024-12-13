@@ -1,10 +1,12 @@
 {% include "_top.html" %}
-
+{% if restaurants %}
 <h2>Restaurants</h2>
 {% for restaurant in restaurants %}
 <p>{{ restaurant.restaurant_info_restaurant_name }}</p>
 {% endfor %}
+{% endif %}
 
+{% if items %}
 <h2>Dishes</h2>
 {% for item in items %}
 <div class="d-flex flex-col gap-2 border-1px border-c-gray:+50 rounded-8px p-2 mb-4">
@@ -27,5 +29,9 @@
     <p><strong>Price:</strong> ${{ item.item_price }}</p>
 </div>
 {% endfor %}
+{% endif %}
 
+{% if not restaurants and not items %}
+    <p>No results found</p>
+{% endif %}
 {% include "_bottom.html" %}

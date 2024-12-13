@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,31 +11,33 @@
         {{ title or "Company" }}
     </title>
 </head>
+
 <body class="w-full h-100vh text-c-gray:-16">
-<header class="px-5 border-b-1 border-c-gray:+16 p-sticky">
-    <nav class="d-flex my-2 j-content-between p-5">
-        <a href="{{ url_for('view_index') }}" class="text-c-black text-w-bold text-xl my-auto">WWWolt</a>
-       
-        {% if not user %}
-        <div class="d-flex gap-5">
-            <a href="{{ url_for('view_signup') }}" class="text-c-blue:+1 text-w-semibold text-lg bg-c-blue:+40 px-4 py-2 rounded-2">Register</a>
-            <a href="{{ url_for('view_login') }}" class="text-c-blue:+40 text-w-semibold text-lg bg-c-blue:+1 px-4 py-2 rounded-2">Login</a>
+    <header class="px-5 border-b-1 border-c-gray:+16 p-sticky">
+        <nav class="d-flex my-2 j-content-between p-5">
+            <a href="{{ url_for('view_restaurants') }}" class="text-c-black text-w-bold text-xl my-auto">WWWolt</a>
+            <form method="get" class="d-flex gap-2">
+                <input type="search" name="search" placeholder="Search..." value="{{ search_query or '' }}">
+                <a href="/view-all?search=">Search</a>
+                <!-- <a class="pt-3 pb-3 pl-4 pr-4 bg-c-red:+1 text-c-white rounded-4" href="{{ url_for('view_admin') }}">
+            Reset
+        </a> -->
+            </form>
+            {% if not user %}
+            <div class="d-flex gap-5">
+                <a href="{{ url_for('view_signup') }}" class="text-c-blue:+1 text-w-semibold text-lg bg-c-blue:+40 px-4 py-2 rounded-2">Register</a>
+                <a href="{{ url_for('view_login') }}" class="text-c-blue:+40 text-w-semibold text-lg bg-c-blue:+1 px-4 py-2 rounded-2">Login</a>
             </div>
 
-        {% else %}
-        <form method="get" action="{{ url_for('view_all') }}" class="d-flex gap-2">
-    <input type="search" name="search" placeholder="Search..." value="{{ search_query or '' }}">
-    <button type="submit">Search</button>
-</form>
-         <div class="d-flex gap-5">
-            <div class="text-w-semibold text-lg bg-c-blue:+40 px-4 py-2 rounded-2 d-flex a-items-center"><a href="{{ url_for('view_login') }}" class="text-c-blue:+1">Logout</a></div>
-           
-            <form id="cart">{% include "__cart_button.html" %}</form>
-         </div>
-        {% endif %}
-    </nav>
-</header>
+            {% else %}
+            <div class="d-flex gap-5">
+                <form method="POST" action="{{url_for('logout')}}" id="logout" class="text-w-semibold text-lg bg-c-blue:+40 px-4 py-2 rounded-2 d-flex a-items-center">
+                    <button class="text-c-blue:+1">Logout</button>
+                </form>
+
+                <form id="cart">{% include "__cart_button.html" %}</form>
+            </div>
+            {% endif %}
+        </nav>
+    </header>
     <div id="toast" class="d-flex flex-col j-content-center p-fixed w-full top-4 z-10 pointer-e-none"></div>
-
-
-    

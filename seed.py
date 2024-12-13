@@ -125,7 +125,6 @@ try:
             restaurant_info_pk CHAR(36),
             restaurant_info_user_fk CHAR(36),
             restaurant_info_restaurant_name VARCHAR(50) NOT NULL,
-            restaurant_info_restaurant_address VARCHAR(100) NOT NULL,
             restaurant_info_longitude DECIMAL(10, 8) NOT NULL,
             restaurant_info_latitude DECIMAL(10, 8) NOT NULL,
             restaurant_info_restaurant_phone VARCHAR(50) NOT NULL,
@@ -241,14 +240,30 @@ try:
             ))
     
      ##############################
+
+        SUSHI_CATEGORY_PK = "16bfbe4a-16c1-4cb0-a7b2-090729f78c38"
+        PASTA_CATEGORY_PK = "f43b1f39-27f5-4edc-a859-39c2c1ea5ac3"
+        BURGER_CATEGORY_PK = "32c83790-34f5-4b86-9bf3-5bffdaa14285"
+        PIZZA_CATEGORY_PK = "ba9762b0-793f-417f-a5eb-b46ab53d1eb5"
+        SALAD_CATEGORY_PK = "2688be80-6ead-40af-8a36-366607ec0348"
+
+        category_map = {
+            "SUSHI": SUSHI_CATEGORY_PK,
+            "PASTA": PASTA_CATEGORY_PK,
+            "BURGER": BURGER_CATEGORY_PK,
+            "PIZZA": PIZZA_CATEGORY_PK,
+            "SALAD": SALAD_CATEGORY_PK
+        }
     # Create food categories
     categories = ["Pizza", "Pasta", "Sushi", "Burger", "Salad"]
     for category in categories:
+
+        category_pk_variable = category_map[category.upper()]
         cursor.execute("""
         INSERT INTO food_categories (
             food_category_pk, food_category_name)
             VALUES (%s, %s)
-        """, (str(uuid.uuid4()), category))
+        """, (category_pk_variable, category))
     
     ##############################
     
@@ -276,9 +291,9 @@ try:
     for restaurant_user in restaurant_users:
         cursor.execute("""
         INSERT INTO restaurant_info (
-            restaurant_info_pk, restaurant_info_user_fk, restaurant_info_restaurant_name, restaurant_info_restaurant_address, restaurant_info_longitude, restaurant_info_latitude, restaurant_info_restaurant_phone, restaurant_info_restaurant_image, restaurant_info_created_at, restaurant_info_updated_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (str(uuid.uuid4()), restaurant_user["user_pk"], fake.company(), fake.address(), random.uniform(*copenhagen_long_range), random.uniform(*copenhagen_lat_range), fake.phone_number(),f"dish_{random.randint(1, 100)}.jpg", int(time.time()), 0))
+            restaurant_info_pk, restaurant_info_user_fk, restaurant_info_restaurant_name, restaurant_info_longitude, restaurant_info_latitude, restaurant_info_restaurant_phone, restaurant_info_restaurant_image, restaurant_info_created_at, restaurant_info_updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (str(uuid.uuid4()), restaurant_user["user_pk"], fake.company(), random.uniform(*copenhagen_long_range), random.uniform(*copenhagen_lat_range), fake.phone_number(),f"dish_{random.randint(1, 100)}.jpg", int(time.time()), 0))
 
 
 

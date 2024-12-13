@@ -1,4 +1,4 @@
-from flask import Flask, session, render_template, redirect, url_for, make_response, request, Blueprint, jsonify
+from flask import Flask, session, render_template, redirect, url_for, make_response, request, Blueprint, flash, jsonify
 from flask_session import Session
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
@@ -8,6 +8,9 @@ import time
 import redis
 import os
 import random
+from faker import Faker
+
+fake = Faker()
 from icecream import ic
 ic.configureOutput(prefix=f'***** | ', includeContext=True)
 
@@ -154,16 +157,14 @@ def view_login():
     ic(session)
     # print(session, flush=True)  
     if session.get("user"):
-        if len(session.get("user").get("roles")) > 1:
-            return redirect(url_for("view_choose_role")) 
         if "admin" in session.get("user").get("roles"):
             return redirect(url_for("view_admin"))
-        if "customer" in session.get("user").get("roles"):
-            return redirect(url_for("view_customer")) 
         if "partner" in session.get("user").get("roles"):
             return redirect(url_for("view_partner"))
         if "restaurant" in session.get("user").get("roles"):
-            return redirect(url_for("view_index"))
+            return redirect(url_for("view_restaurant_profile"))
+        if "customer" in session.get("user").get("roles"):
+            return redirect(url_for("view_customer")) 
 
     if session.get("new_user"):
         message=session.get("new_user", "")  
@@ -183,8 +184,8 @@ def view_customer():
     ic(user)
     if "partner" in user["roles"]:
         return redirect(url_for("view_partner"))
-    if "resturant" in user["roles"]:
-        return redirect(url_for("view_resturant"))
+    if "restaurant" in user["roles"]:
+        return redirect(url_for("view_restaurant_profile"))
     
     cart = session.get("cart")
     cart_count = len(cart) if cart else 0
@@ -201,8 +202,8 @@ def view_partner():
     if not session.get("user", ""): 
         return redirect(url_for("view_login"))
     user = session.get("user")
-    if len(user.get("roles", "")) < 1:
-        return redirect(url_for("view_choose_role"))
+    if not "partner" in user["roles"]:
+        return render_template(url_for("view_login"))
     return render_template("view_partner.html", user=user)
 
 
@@ -219,8 +220,13 @@ def view_admin():
 
         db, cursor = x.db()
         
-
-        return render_template("view_admin.html")
+        cart = session.get("cart")
+        cart_count = len(cart) if cart else 0
+        cart_price = 0
+        if cart:
+            for item in cart:
+                cart_price += item["item_price"]
+        return render_template("view_admin.html", user=user, cart_count = cart_count, cart_price = cart_price)
     
     
     except Exception as ex:
@@ -434,19 +440,32 @@ def view_verify_partner():
     user = session.get("user")
     if "partner" in user["roles"]:
         return redirect(url_for("view_login"))
-    return render_template("view_verify_partner.html", user=user)
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+    return render_template("view_verify_partner.html", user=user, cart_count = cart_count, cart_price = cart_price, x=x)
     
 
 ##############################
 @app.get("/create-resturant")
-@x.no_cache
 def view_create_resturant():
+    ic("CREATE RESTURANT")
     if not session.get("user", ""):
         return redirect(url_for("view_login"))
     user = session.get("user")
-    if "resturant" or "partner" in user["roles"]:
+    if "restaurant" in user["roles"] or "partner" in user["roles"]:
         return redirect(url_for("view_login"))
-    return render_template("view_create_resturant.html", user=user)
+   
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+    return render_template("view_create_resturant.html", user=user, cart_count = cart_count, cart_price = cart_price, x=x)
 
 
 ##############################
@@ -693,6 +712,128 @@ def _________POST_________(): pass
 ##############################
 ##############################
 
+
+##############################
+@app.post("/resturants")
+def add_resturant():
+    try:
+
+        if not session.get("user", ""):
+            return redirect(url_for("view_login"))
+        
+        resturant_name = x.validate_resturant_name()
+        resturant_category = x.validate_resturant_category()
+        resturant_phone = x.validate_resturant_phone()
+        user = session.get("user", "")
+        copenhagen_lat_range = (55.61, 55.73)
+        copenhagen_long_range = (12.48, 12.60)
+        resturant_pk = str(uuid.uuid4())
+
+
+        
+
+        ic(resturant_pk)
+        ic(user["user_pk"])
+
+        db, cursor = x.db()
+        q = """INSERT INTO restaurant_info (
+            restaurant_info_pk, restaurant_info_user_fk, restaurant_info_restaurant_name, restaurant_info_longitude, restaurant_info_latitude, restaurant_info_restaurant_phone, restaurant_info_restaurant_image, restaurant_info_created_at, restaurant_info_updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+        cursor.execute(q, (resturant_pk, user["user_pk"], resturant_name, random.uniform(*copenhagen_long_range), random.uniform(*copenhagen_lat_range), resturant_phone,f"dish_{random.randint(1, 100)}.jpg", int(time.time()), 0))
+
+        ic("resturant added")
+
+        q = "INSERT INTO users_roles (user_role_user_fk, user_role_role_fk) VALUES(%s, %s)"
+        cursor.execute(q, (user["user_pk"], x.RESTAURANT_ROLE_PK))
+
+
+        q = """
+            SELECT * FROM users
+            JOIN users_roles ON user_pk = user_role_user_fk
+            JOIN roles ON role_pk = user_role_role_fk
+            WHERE LOWER(TRIM(user_email)) = LOWER(TRIM(%s))
+        """
+        cursor.execute(q, (user["user_email"],))
+        rows = cursor.fetchall()
+
+        print("Number of rows found:", len(rows))
+        if rows:
+            print("Found user details:", rows[0])
+        else:
+            print("No user found with email:", user["user_email"])
+        
+        roles = []
+
+        session.pop("user")
+
+        for row in rows:
+            roles.append(row["role_name"])
+        user = {
+            "user_pk": rows[0]["user_pk"],
+            "user_name": rows[0]["user_name"],
+            "user_last_name": rows[0]["user_last_name"],
+            "user_email": rows[0]["user_email"],
+            "user_avatar": rows[0]["user_avatar"],
+            "roles": roles
+        }
+        ic(user)
+
+        session["user"] = user
+
+
+
+        SUSHI_CATEGORY_PK = "16bfbe4a-16c1-4cb0-a7b2-090729f78c38"
+        PASTA_CATEGORY_PK = "f43b1f39-27f5-4edc-a859-39c2c1ea5ac3"
+        BURGER_CATEGORY_PK = "32c83790-34f5-4b86-9bf3-5bffdaa14285"
+        PIZZA_CATEGORY_PK = "ba9762b0-793f-417f-a5eb-b46ab53d1eb5"
+        SALAD_CATEGORY_PK = "2688be80-6ead-40af-8a36-366607ec0348"
+
+        category_map = {
+            "SUSHI": SUSHI_CATEGORY_PK,
+            "PASTA": PASTA_CATEGORY_PK,
+            "BURGER": BURGER_CATEGORY_PK,
+            "PIZZA": PIZZA_CATEGORY_PK,
+            "SALAD": SALAD_CATEGORY_PK
+        }
+
+
+        for cat in resturant_category:
+            ic(cat)
+
+            category_pk_variable = category_map[cat.upper()]
+
+            ic(category_pk_variable)
+
+
+            q = """INSERT INTO restaurant_food_category (restaurant_food_category_food_category_fk, restaurant_food_category_user_fk) values(%s, %s)"""
+            cursor.execute(q, (category_pk_variable, user["user_pk"]))
+
+
+        db.commit()
+
+        return """<template mix-redirect='/login'></template>"""
+    
+    except Exception as ex:
+
+        ic(ex)
+        if "db" in locals(): db.rollback()
+
+        # My own exception
+        if isinstance(ex, x.CustomException):
+            return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
+        
+        # Database exception
+        if isinstance(ex, x.mysql.connector.Error):
+            ic(ex)
+            return "<template>System upgrading</template>", 500  
+        # Any other exception
+        return """<template mix-target="#toast" mix-bottom>System under maintenance</template>""", 500  
+    
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
 ##############################
 @app.post("/partner-verification/<user_pk>")
 def send_partner_verification(user_pk):
@@ -799,16 +940,19 @@ def send_partner_verification(user_pk):
 
 ##############################
 @app.post("/logout")
-
 def logout():
-    # ic("#"*30)
-    # ic(session)
+    print("Logout route hit")  # Debug print
+    ic("#"*30)
+    ic(session)
     session.pop("user", None)
     session.clear()
-    # session.clear()
-    # session.modified = True
-    # ic("*"*30)
-    # ic(session)
+    
+    # Add a flash message to confirm logout
+    flash("You have been logged out", "success")
+    
+    # Explicitly print the redirect URL
+    print(f"Redirecting to: {url_for('view_login')}")
+    
     return redirect(url_for("view_login"))
 
 ##############################

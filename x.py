@@ -19,6 +19,14 @@ PARTNER_ROLE_PK = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
 RESTAURANT_ROLE_PK = "9f8c8d22-5a67-4b6c-89d7-58f8b8cb4e15"
 
 
+SUSHI_CATEGORY_PK = "16bfbe4a-16c1-4cb0-a7b2-090729f78c38"
+PASTA_CATEGORY_PK = "f43b1f39-27f5-4edc-a859-39c2c1ea5ac3"
+BURGER_CATEGORY_PK = "32c83790-34f5-4b86-9bf3-5bffdaa14285"
+PIZZA_CATEGORY_PK = "ba9762b0-793f-417f-a5eb-b46ab53d1eb5"
+SALAD_CATEGORY_PK = "2688be80-6ead-40af-8a36-366607ec0348"
+
+
+
 # form to get data from input fields
 # args to get data from the url
 # values to get data from the url and from the form
@@ -84,6 +92,43 @@ def validate_user_name():
     user_name = request.form.get("user_name", "").strip()
     if not re.match(USER_NAME_REGEX, user_name): raise_custom_exception(error, 400)
     return user_name
+
+
+##############################
+RESTURANT_NAME_MIN = 2
+RESTURANT_NAME_MAX = 50
+RESTURANT_NAME_REGEX = f"^.{{{RESTURANT_NAME_MIN},{RESTURANT_NAME_MAX}}}$"
+def validate_resturant_name():
+    error = f"name {RESTURANT_NAME_MIN} to {RESTURANT_NAME_MAX} characters"
+    resturant_name = request.form.get("resturant_name", "").strip()
+    if not re.match(RESTURANT_NAME_REGEX, resturant_name): raise_custom_exception(error, 400)
+    return resturant_name
+
+##############################
+def validate_resturant_category():
+    selected_category = request.form.getlist("food_category")
+    ic(selected_category)
+    error = "You must choose at least one category"
+    if not selected_category: raise_custom_exception(error, 400)
+    return selected_category
+
+##############################
+DANISH_PHONE_REGEX = r"^(1|2|3|4|5|6|7|8|9)\d{7}$"
+def validate_resturant_phone():
+    resturant_phone_number = request.form.get("resturant_number")
+    error = "Phone number must be entered"
+    cleaned_number = re.sub(r'\D', '', resturant_phone_number) #cleans the number down
+    if not cleaned_number:
+        raise_custom_exception(error, 400)
+    if len(cleaned_number) != 8:
+        error = "Must be danish phone number, 8 characters"
+        raise_custom_exception(error, 400)
+    if not re.match(DANISH_PHONE_REGEX, cleaned_number):
+        error = "Invalid phone number, must be 8 characters"
+    return cleaned_number
+
+
+
 
 ##############################
 USER_LAST_NAME_MIN = 2
@@ -278,7 +323,7 @@ def send_order_email():
         pass
 
 ##############################
-def send_block_email(to_email, type_of_block):
+def send_block_email(to_email, type_of_block, item_or_user):
     try:
         # Create a gmail fullflaskdemomail
         # Enable (turn on) 2 step verification/factor in the google account manager

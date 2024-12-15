@@ -30,24 +30,6 @@ def _________GET_________(): pass
 ##############################
 ##############################
 
-##############################
-@app.get("/test-set-redis")
-def view_test_set_redis():
-    redis_host = "redis"
-    redis_port = 6379
-    redis_client = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)    
-    redis_client.set("name", "Santiago", ex=10)
-    # name = redis_client.get("name")
-    return "name saved"
-
-@app.get("/test-get-redis")
-def view_test_get_redis():
-    redis_host = "redis"
-    redis_port = 6379
-    redis_client = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)    
-    name = redis_client.get("name")
-    if not name: name = "no name"
-    return name
 
 
 ##############################
@@ -805,22 +787,6 @@ def confirm_delete_restaurant():
         return render_template("confirm_delete_profile.html", title="Delete Profile", x=x, user=user, cart_count=cart_count, cart_price=cart_price), 200
    
 
-##############################
-# @app.get("/order-confirmed")
-# def view_order_confirmed():
-#     x.no_cache
-#     user = session.get("user")
-#     cart_items = session.get("cart")
-#     if not cart_items:
-#         return redirect(url_for("view_restaurants"), 302)
-#     session.pop("cart")
-#     confirmed_template = render_template("view_order_confirmed.html", user=user, cart_items=cart_items, title="Order Confirmed"), 200
-#     toast = render_template("___toast_success.html", message="Order confirmed. An email has been sent to you")
-#     return f"""<template mix-target="#checkoutBody" mix-replace>{confirmed_template}</template>
-#                 <template mix-target="#toast" mix-bottom>{toast}</template>
-#                 <template mix-target="#cartBtn" mix-replace></template>"""
-
-
 
 
 ##############################
@@ -1356,65 +1322,6 @@ def login():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
-
-##############################
-
-
-
-
-
-##############################
-# @app.post("/login")
-# def login():
-#     try:
-
-#         user_email = x.validate_user_email()
-#         user_password = x.validate_user_password()
-
-#         db, cursor = x.db()
-#         q = """ SELECT * FROM users 
-#                 JOIN users_roles 
-#                 ON user_pk = user_role_user_fk 
-#                 JOIN roles
-#                 ON role_pk = user_role_role_fk
-#                 WHERE user_email = %s"""
-#         cursor.execute(q, (user_email,))
-#         rows = cursor.fetchall()
-#         ic(rows)
-#         if not rows:
-#             toast = render_template("___toast.html", message="user not registered")
-#             return f"""<template mix-target="#toast">{toast}</template>""", 400     
-#         if not check_password_hash(rows[0]["user_password"], user_password):
-#             toast = render_template("___toast.html", message="invalid credentials")
-#             return f"""<template mix-target="#toast">{toast}</template>""", 401
-#         roles = []
-#         for row in rows:
-#             roles.append(row["role_name"])
-#         user = {
-#             "user_pk": rows[0]["user_pk"],
-#             "user_name": rows[0]["user_name"],
-#             "user_last_name": rows[0]["user_last_name"],
-#             "user_email": rows[0]["user_email"],
-#             "roles": roles
-#         }
-#         ic(user)
-#         session["user"] = user
-#         if len(roles) == 1:
-#             return f"""<template mix-redirect="/{roles[0]}"></template>"""
-#         return f"""<template mix-redirect="/choose-role"></template>"""
-#     except Exception as ex:
-#         ic(ex)
-#         if "db" in locals(): db.rollback()
-#         if isinstance(ex, x.CustomException): 
-#             toast = render_template("___toast.html", message=ex.message)
-#             return f"""<template mix-target="#toast" mix-bottom>{toast}</template>""", ex.code    
-#         if isinstance(ex, x.mysql.connector.Error):
-#             ic(ex)
-#             return "<template>System upgrating</template>", 500        
-#         return "<template>System under maintenance</template>", 500  
-#     finally:
-#         if "cursor" in locals(): cursor.close()
-#         if "db" in locals(): db.close()
 
 
 

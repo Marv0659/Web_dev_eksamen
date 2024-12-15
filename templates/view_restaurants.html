@@ -33,15 +33,15 @@
         </ul>
         <h2>Restaurants</h2>
     
-        <ul class="d-grid cols-12 gap-x-5 gap-y-15 list-style-none mb-20">
+        <ul class="d-grid cols-3 gap-x-5 gap-y-15 list-style-none mb-20">
             {% for restaurant in restaurant_users %}
-            <a href="/{{restaurant.restaurant_info_user_fk}}/items" class="w-full h-full col-4">
-                <div class="shadow-xs w-full h-full rounded-2 ts-200" hover="shadow-md scale-102">
-                    <img src="{{ url_for('static', filename='dishes/'+restaurant.restaurant_info_restaurant_image) }}"
-                        class="w-full h-40 obj-f-cover rounded-2" alt="">
-                    <p>{{restaurant.restaurant_info_restaurant_name}}</p>
-                </div>
-            </a>
+            <a href="/{{restaurant.restaurant_info_user_fk}}/items" class="w-full h-full">
+                    <div class="shadow-xs w-full h-full rounded-2 ts-200" hover="shadow-md scale-102">
+                        <img src="{{ url_for('static', filename='dishes/'+restaurant.restaurant_info_restaurant_image) }}"
+                            class="w-full h-40 obj-f-cover rounded-2" alt="">
+                        <p class="text-c-black pa-2">{{restaurant.restaurant_info_restaurant_name}}</p>
+                    </div>
+                </a>
             {% endfor %}
         </ul>
 </section>

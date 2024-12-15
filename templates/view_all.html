@@ -1,37 +1,44 @@
 {% include "_top.html" %}
+<main class="mx-10">
 {% if restaurants %}
-<h2>Restaurants</h2>
-{% for restaurant in restaurants %}
-<p>{{ restaurant.restaurant_info_restaurant_name }}</p>
-{% endfor %}
-{% endif %}
 
-{% if items %}
-<h2>Dishes</h2>
-{% for item in items %}
-<div class="d-flex flex-col gap-2 border-1px border-c-gray:+50 rounded-8px p-2 mb-4">
-    {% set images = item.item_image.split(',') if item.item_image else [] %}
-    {% if images %}
-    {% for img_filename in images %}
-    <img src="{{ url_for('static', filename='images/' + img_filename) }}" alt="{{ item.item_title }}"
-        class="w-25% h-auto rounded-8px mb-2">
+     
+    <h2 class="mt-10">Restaurants</h2>
+    <ul class="d-grid cols-3 gap-x-5 gap-y-15 list-style-none mb-20">
+    {% for restaurant in restaurants %}
+    <a href="/{{restaurant.restaurant_info_user_fk}}/items" class="w-full h-full">
+                    <div class="shadow-xs w-full h-full rounded-2 ts-200" hover="shadow-md scale-102">
+                        <img src="{{ url_for('static', filename='dishes/'+restaurant.restaurant_info_restaurant_image) }}"
+                            class="w-full h-40 obj-f-cover rounded-2" alt="">
+                        <p class="text-c-black pa-2">{{restaurant.restaurant_info_restaurant_name}}</p>
+                    </div>
+                </a>
     {% endfor %}
-    {% else %}
-    <p class="text-c-gray">No images available.</p>
-    {% endif %}
+    </ul>
 
-    <p><strong>Title:</strong> {{ item.item_title }}</p>
-    {% if item.item_description %}
-    <p><strong>Description:</strong> {{ item.item_description }}</p>
-    {% else %}
-    <p class="text-c-gray">No description available.</p>
     {% endif %}
-    <p><strong>Price:</strong> ${{ item.item_price }}</p>
-</div>
-{% endfor %}
-{% endif %}
-
-{% if not restaurants and not items %}
-    <p>No results found</p>
-{% endif %}
+    
+    {% if items %}
+    <h2>Dishes</h2>
+    <ul class="d-grid gap-x-5 gap-y-15 cols-4 list-style-none mt-5 ">
+    {% for item in items %}
+        <a href="/item/{{item.item_pk}}?image={{item.item_image}}" class="w-full h-full">
+                    <div class="shadow-sm w-full h-full rounded-2 ts-200 d-flex j-content-between a-items-end pa-2" hover="shadow-md scale-102">
+                       
+                        <div>
+                            <p class="text-c-black">{{item.item_title}}</p>
+                            <p class="text-c-black">${{item.item_price}}</p>
+                        </div>
+                         <img src="{{ url_for('static', filename='dishes/' + item.item_image) }}"
+                            class="w-25 h-25 obj-f-cover rounded-2" alt="">
+                    </div>
+                </a>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    
+    {% if not restaurants and not items %}
+        <p>No results found</p>
+    {% endif %}
+</main>
 {% include "_bottom.html" %}

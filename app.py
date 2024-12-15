@@ -725,19 +725,19 @@ def confirm_delete_restaurant():
    
 
 ##############################
-@app.get("/order-confirmed")
-def view_order_confirmed():
-    x.no_cache
-    user = session.get("user")
-    cart_items = session.get("cart")
-    if not cart_items:
-        return redirect(url_for("view_restaurants"), 302)
-    session.pop("cart")
-    confirmed_template = render_template("view_order_confirmed.html", user=user, cart_items=cart_items, title="Order Confirmed"), 200
-    toast = render_template("___toast_success.html", message="Order confirmed. An email has been sent to you")
-    return f"""<template mix-target="#checkoutBody" mix-replace>{confirmed_template}</template>
-                <template mix-target="#toast" mix-bottom>{toast}</template>
-                <template mix-target="#cartBtn" mix-replace></template>"""
+# @app.get("/order-confirmed")
+# def view_order_confirmed():
+#     x.no_cache
+#     user = session.get("user")
+#     cart_items = session.get("cart")
+#     if not cart_items:
+#         return redirect(url_for("view_restaurants"), 302)
+#     session.pop("cart")
+#     confirmed_template = render_template("view_order_confirmed.html", user=user, cart_items=cart_items, title="Order Confirmed"), 200
+#     toast = render_template("___toast_success.html", message="Order confirmed. An email has been sent to you")
+#     return f"""<template mix-target="#checkoutBody" mix-replace>{confirmed_template}</template>
+#                 <template mix-target="#toast" mix-bottom>{toast}</template>
+#                 <template mix-target="#cartBtn" mix-replace></template>"""
 
 
 
@@ -777,6 +777,7 @@ def view_restaurant_by_category(food_category_pk):
 def view_all():
     search_query = request.args.get('search', '').strip()
     user = session.get("user")
+    cart = session.get("cart")
     db, cursor = x.db()
     if search_query:
         # Modify query to include search functionality
@@ -804,9 +805,13 @@ def view_all():
         cursor.execute(q)
         items = cursor.fetchall()
 
-
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
     
-    return render_template("view_all.html", search_query=search_query, user=user, items=items, restaurants=restaurants), 200
+    return render_template("view_all.html", search_query=search_query, user=user, items=items, restaurants=restaurants, cart_count=cart_count, cart_price=cart_price), 200
 ##############################
 
 ##############################API_GET_ROUTE##############################
@@ -1230,7 +1235,7 @@ def login():
             toast = render_template("___toast.html", message="invalid credentials")
             return f"""<template mix-target="#toast">{toast}</template>""", 401
         
-        if rows[0]["user_deleted_at"] == 0:
+        if rows[0]["user_deleted_at"] != 0:
             toast = render_template("___toast.html", message="user deleted")
             return f"""<template mix-target="#toast">{toast}</template>""", 404        
         roles = []
@@ -1424,12 +1429,15 @@ def set_item_cookie(item_pk):
         q = "SELECT * FROM items WHERE item_pk = %s"
         cursor.execute(q, (item_pk,))
         item = cursor.fetchone()
+
+        item_id = item.copy()
+        item_id["unique_id"] = str(uuid.uuid4())
         if 'cart' not in session:
             # If not, create a new list with the current item
-            session['cart'] = [item]
+            session['cart'] = [item_id]
         else:
             # If it exists, append the new item to the list
-            session['cart'].append(item)
+            session['cart'].append(item_id)
         cart = session.get("cart")
         cart_count = len(cart) if cart else 0
         cart_price = 0
@@ -1445,6 +1453,41 @@ def set_item_cookie(item_pk):
         ic(ex)
         return "Error setting cookie", 500
 
+@app.post("/remove-from-cart/<unique_id>")
+def remove_from_cart(unique_id):
+    try:
+        user = session.get("user")
+        # Validate item_pk
+        unique_id = x.validate_uuid4(unique_id)
+        
+        # Check if the cart exists in the session
+        if 'cart' not in session or not session['cart']:
+            return "Cart is empty", 400
+        
+        # Remove the item from the cart by filtering out the matching item_pk
+        cart = session['cart']
+        updated_cart = [item for item in cart if item["unique_id"] != unique_id]
+        
+        # Update the session cart
+        session['cart'] = updated_cart
+        
+        # Recalculate cart count and price
+        cart_count = len(updated_cart)
+        cart_price = sum(item["item_price"] for item in updated_cart)
+        
+        # Render the updated toast and cart button templates
+        toast = render_template("___toast_success.html", message="Item removed from cart")
+        cartBtn = render_template("__cart_button.html", cart_count=cart_count, cart_price=cart_price)
+        newCheckout = render_template("updated_view_checkout.html", user=user, cart=updated_cart, cart_count=cart_count, cart_price=cart_price)
+        # Return the updated components
+        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>
+                   <template mix-target="#cartBtn" mix-replace>{cartBtn}</template>
+                   <template mix-target="#checkoutBody" mix-replace>{newCheckout}</template>
+                """
+    except Exception as ex:
+        ic(ex)
+        return "Error removing item from cart", 500
+
 
 ##############################
 @app.post("/pay-now/<user_pk>")
@@ -1455,10 +1498,16 @@ def send_order_email(user_pk):
         q = "SELECT * FROM users WHERE user_pk = %s"
         cursor.execute(q, (user_pk,))
         cart = session.get("cart")
+        cart_items = cart
+        session.pop("cart")
         user = cursor.fetchone()
         toast = render_template("___toast_success.html", message="An email has been sent to you with your order details.")
+        confirm_template = render_template("view_order_confirmed.html", user=user, cart_items=cart_items, title="Order Confirmed")
         x.send_order_email(cart)
-        return redirect(url_for("view_order_confirmed"), 303)
+        return f"""<template mix-target="#toast" mix-bottom>{toast}</template>
+                     <template mix-target="#checkoutBody" mix-replace>{confirm_template}</template>
+                    
+        """
     except Exception as ex:
         ic(ex)
         return "Error sending mail", 500

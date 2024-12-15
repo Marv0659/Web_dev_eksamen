@@ -1,4 +1,4 @@
-{% include "_top.html" %}
+
 
 <main id="checkoutBody" class="w-full px-5">
      <h1 class="mb-10 text-w-bold">Checkout</h1>
@@ -17,7 +17,9 @@
                 </div>
             {% endfor %} -->
             <p><span class="text-w-bold">Item total price:</span> ${{cart_price}}</p>
+            {% if cart_price > 0 %}
             <form id="payBtn"><button class="bg-c-black:+10 w-full text-c-white:-10 ma-auto text-150 text-w-semibold cursor-pointer ts-200 ts-f-ease" hover="bg-c-black:+20" mix-await="Confirming payment..." mix-default="Pay now" mix-post="/pay-now/{{user.user_pk}}" mix-data="#payBtn">Pay now</button></form>
+            {% endif %}
         </div>
     </div>
 
@@ -44,4 +46,4 @@
 </main>
 
 
-{% include "_bottom.html" %}
+

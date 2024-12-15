@@ -225,9 +225,9 @@ def validate_uuid4(uuid4 = ""):
     return uuid4
 
 ##############################
-UPLOAD_ITEM_FOLDER = './static/images'
+UPLOAD_ITEM_FOLDER = './static/dishes'
 ALLOWED_ITEM_FILE_EXTENSIONS = {"png", "jpg", "jpeg", "gif","webp"}
-REGEX_ITEM_IMAGE = r'^.*\.(jpg|jpeg|png|gif)$'
+REGEX_ITEM_IMAGE = r'^.*\.(jpg|jpeg|webp|png|gif)$'
 
 def validate_item_image(file):
     if not file or file.filename == "":

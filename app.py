@@ -1758,8 +1758,10 @@ def update_item(item_pk):
         if len(files) > 3:
             x.raise_custom_exception("You can upload a maximum of 3 images", 400)
 
+        image_details = [(file, x.validate_item_image(file)) for file in files]
         
-        image_details = x.validate_item_image()  # returns a list of (file, filename)
+
+         # returns a list of (file, filename)
 
         image_filenames = []
         for file, filename in image_details:
@@ -1767,7 +1769,7 @@ def update_item(item_pk):
             image_filenames.append(filename)
 
 # Join filenames as comma-separated or handle as needed
-        image_field_value = ",".join(image_filenames)
+        item_image_field = ",".join(image_filenames)
 
 # Update the database with image_field_value
 

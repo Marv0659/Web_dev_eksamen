@@ -1,8 +1,8 @@
-{% include "_top_logged.html" %}
+{% include "_top.html" %}
 
 <section class="d-flex flex-col gap-10 pa-10">
 
-    <a href="{{url_for('view_admin')}}">Back to profile</a>
+    <a class="text-c-white pa-5 rounded-sm bg-c-blue w-fit-content" href="{{url_for('view_admin')}}">Back to profile</a>
 
     <form method="get" class="d-flex gap-5 mb-10">
         <input type="search" name="search" placeholder="Search items..." class="form-control flex-grow" value="{{ search_query or '' }}">
@@ -17,10 +17,15 @@
     {% for item in items %}
     <div class="d-flex flex-row j-content-between">
         <div class="d-flex gap-5">
+            <img src="{{url_for('static', filename='dishes/' + item.item_image)}}" alt="dish image" class="w-12 h-12 rounded-full">
+
             <p>
                 {{item.item_title}}
             </p>
             <div class="h-full w-1 bg-c-blue:+8 rounded-xl opacity-50"></div>
+            <p>
+                {{item.user_email}}
+            </p>
         </div>
         <div class="d-flex">
             <form class="" id="block">

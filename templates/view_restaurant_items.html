@@ -12,7 +12,7 @@
                 {% set images = item.item_image.split(',') if item.item_image else [] %}
                 {% if images %}
                 {% for img_filename in images %}
-                <img src="{{ url_for('static', filename='images/' + img_filename) }}" alt="{{ item.item_title }}"
+                <img src="{{ url_for('static', filename='dishes/' + img_filename) }}" alt="{{ item.item_title }}"
                     class="w-full h-auto rounded-2 mb-2 obj-f-cover">
                 {% endfor %}
                 {% else %}

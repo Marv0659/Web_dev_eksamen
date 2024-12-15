@@ -1522,8 +1522,10 @@ def set_item_cookie(item_pk):
                 cart_price += item["item_price"]
         toast = render_template("___toast_success.html", message="Item added to cart")
         cartBtn = render_template("__cart_button.html", cart_count=cart_count, cart_price=cart_price)
+        cartBtnMobile = render_template("__cart_button_mobile.html", cart_count=cart_count, cart_price=cart_price)
         return f"""<template mix-target="#toast" mix-bottom>{toast}</template>
                    <template mix-target="#cartBtn" mix-replace>{cartBtn}</template>
+                     <template mix-target="#cartBtnMobile" mix-replace>{cartBtnMobile}</template>
                     """
     except Exception as ex:
         ic(ex)
@@ -1554,10 +1556,12 @@ def remove_from_cart(unique_id):
         # Render the updated toast and cart button templates
         toast = render_template("___toast_success.html", message="Item removed from cart")
         cartBtn = render_template("__cart_button.html", cart_count=cart_count, cart_price=cart_price)
+        cartBtnMobile = render_template("__cart_button_mobile.html", cart_count=cart_count, cart_price=cart_price)
         newCheckout = render_template("updated_view_checkout.html", user=user, cart=updated_cart, cart_count=cart_count, cart_price=cart_price)
         # Return the updated components
         return f"""<template mix-target="#toast" mix-bottom>{toast}</template>
                    <template mix-target="#cartBtn" mix-replace>{cartBtn}</template>
+                     <template mix-target="#cartBtnMobile" mix-replace>{cartBtnMobile}</template>
                    <template mix-target="#checkoutBody" mix-replace>{newCheckout}</template>
                 """
     except Exception as ex:

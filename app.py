@@ -360,21 +360,28 @@ def view_admin_items():
         
         # Get search query from request
         search_query = request.args.get('search', '').strip()
-        
+                
         if search_query:
-            # Modify query to include search functionality
+            # JOIN query with users table for search functionality
             q = """
-            SELECT * FROM items 
+            SELECT items.*, users.user_email 
+            FROM items 
+            JOIN users ON items.item_user_fk = users.user_pk
             WHERE item_title LIKE %s 
             """
             search_param = f'%{search_query}%'
             cursor.execute(q, (search_param, ))
         else:
-            # Original query if no search
-            q = "SELECT * FROM items"
+            # JOIN query with users table for standard retrieval
+            q = """
+            SELECT items.*, users.user_email 
+            FROM items 
+            JOIN users ON items.item_user_fk = users.user_pk
+            """
             cursor.execute(q)
 
         items = cursor.fetchall()
+
 
         cart = session.get("cart")
         cart_count = len(cart) if cart else 0
@@ -618,25 +625,41 @@ def view_restaurant_profile():
     try:
         if not session.get("user", ""): 
             return redirect(url_for("view_login"))
-        user = session.get("user")
-        if not "restaurant" in user.get("roles", ""):
+        session_user = session.get("user")
+        if not "restaurant" in session_user.get("roles", ""):
             return redirect(url_for("view_login"))
+        
+        ic(session_user)
         db, cursor = x.db()
         query = """
-            SELECT user_name, user_email
+            SELECT user_name, user_last_name, user_email, user_avatar
             FROM users
             WHERE user_pk = %s
         """
-        cursor.execute(query, (user.get("user_pk"),))
-        user = cursor.fetchone()
+        cursor.execute(query, (session_user.get("user_pk"),))
+        user_details = cursor.fetchone()
+
+        q = """
+            SELECT * 
+            FROM restaurant_info
+            WHERE restaurant_info_user_fk = %s
+        """
+        cursor.execute(q, (session_user.get("user_pk"),))
+        restaurant_info = cursor.fetchone()
+
+        ic(restaurant_info)
+
+
         cart = session.get("cart")
         cart_count = len(cart) if cart else 0
         cart_price = 0
         if cart:
             for item in cart:
                 cart_price += item["item_price"]
+
         
-        return render_template("view_restaurant_profile.html", user=user, title="Restaurant Profile", x=x, cart_count=cart_count, cart_price=cart_price)
+        
+        return render_template("view_restaurant_profile.html", user=session_user, title="Restaurant Profile", x=x, cart_count=cart_count, cart_price=cart_price, restaurant_info=restaurant_info)
     except Exception as ex:
         if "db" in locals():
             db.rollback()
@@ -1205,6 +1228,9 @@ def login():
             toast = render_template("___toast.html", message="invalid credentials")
             return f"""<template mix-target="#toast">{toast}</template>""", 401
         
+        if rows[0]["user_deleted_at"] == 0:
+            toast = render_template("___toast.html", message="user deleted")
+            return f"""<template mix-target="#toast">{toast}</template>""", 404        
         roles = []
         for row in rows:
             roles.append(row["role_name"])
@@ -1216,7 +1242,7 @@ def login():
             "user_avatar": rows[0]["user_avatar"],
             "roles": roles
         }
-        ic(user)
+        ic(user) 
 
         session["user"] = user
 

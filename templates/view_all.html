@@ -20,7 +20,7 @@
     
     {% if items %}
     <h2>Dishes</h2>
-    <ul class="d-grid gap-x-5 gap-y-15 cols-4 list-style-none mt-5 ">
+    <ul class="d-grid gap-x-5 gap-y-15 cols-2 list-style-none mt-5" md="cols-4">
     {% for item in items %}
         <a href="/item/{{item.item_pk}}?image={{item.item_image}}" class="w-full h-full">
                     <div class="shadow-sm w-full h-full rounded-2 ts-200 d-flex j-content-between a-items-end pa-2" hover="shadow-md scale-102">
@@ -30,7 +30,7 @@
                             <p class="text-c-black">${{item.item_price}}</p>
                         </div>
                          <img src="{{ url_for('static', filename='dishes/' + item.item_image) }}"
-                            class="w-25 h-25 obj-f-cover rounded-2" alt="">
+                            class="w-20 h-25 obj-f-cover rounded-2" sm="w-25" alt="">
                     </div>
                 </a>
     {% endfor %}

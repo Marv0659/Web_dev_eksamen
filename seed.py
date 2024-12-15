@@ -171,6 +171,55 @@ try:
     }
     insert_user_with_role(admin_user, x.ADMIN_ROLE_PK)
 
+    customer_user = {
+        "user_pk": str(uuid.uuid4()),
+        "user_name": "Customer",
+        "user_last_name": "User",
+        "user_email": "customer@fulldemo.com",
+        "user_password": generate_password_hash("password"),
+        "user_avatar": "profile_10.jpg",
+        "user_created_at": int(time.time()),
+        "user_deleted_at": 0,
+        "user_blocked_at": 0,
+        "user_updated_at": 0,
+        "user_verified_at": int(time.time()),
+        "user_verification_key": str(uuid.uuid4())
+    }
+    insert_user_with_role(customer_user, x.CUSTOMER_ROLE_PK)
+    
+    partner_user = {
+        "user_pk": "542dbb52-17c1-4685-abe7-bebb9d8da70a",
+        "user_name": "Partner",
+        "user_last_name": "User",
+        "user_email": "partner@fulldemo.com",
+        "user_password": generate_password_hash("password"),
+        "user_avatar": "profile_10.jpg",
+        "user_created_at": int(time.time()),
+        "user_deleted_at": 0,
+        "user_blocked_at": 0,
+        "user_updated_at": 0,
+        "user_verified_at": int(time.time()),
+        "user_verification_key": str(uuid.uuid4())
+    }
+    insert_user_with_role(partner_user, x.PARTNER_ROLE_PK)
+
+    restaurant_user = {
+        "user_pk": str(uuid.uuid4()),
+        "user_name": "Restaurant",
+        "user_last_name": "User",
+        "user_email": "restaurant@fulldemo.com",
+        "user_password": generate_password_hash("password"),
+        "user_avatar": "profile_10.jpg",
+        "user_created_at": int(time.time()),
+        "user_deleted_at": 0,
+        "user_blocked_at": 0,
+        "user_updated_at": 0,
+        "user_verified_at": int(time.time()),
+        "user_verification_key": str(uuid.uuid4())
+    }
+    insert_user_with_role(restaurant_user, x.RESTAURANT_ROLE_PK)
+
+
     ##############################
     # Insert 50 customers
     domains = ["example.com", "testsite.org", "mydomain.net", "website.co", "fakemail.io"]

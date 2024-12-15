@@ -1480,7 +1480,9 @@ def remove_from_cart(unique_id):
 @app.post("/pay-now/<user_pk>")
 def send_order_email(user_pk):
     try:
+        user_email = user["user_email"]
         user_pk = x.validate_uuid4(user_pk)
+        user_email = x.validate_user_email()
         db, cursor = x.db()
         q = "SELECT * FROM users WHERE user_pk = %s"
         cursor.execute(q, (user_pk,))
@@ -1488,9 +1490,10 @@ def send_order_email(user_pk):
         cart_items = cart
         session.pop("cart")
         user = cursor.fetchone()
+        
         toast = render_template("___toast_success.html", message="An email has been sent to you with your order details.")
         confirm_template = render_template("view_order_confirmed.html", user=user, cart_items=cart_items, title="Order Confirmed")
-        x.send_order_email(cart)
+        x.send_order_email(cart, user_email)
         return f"""<template mix-target="#toast" mix-bottom>{toast}</template>
                      <template mix-target="#checkoutBody" mix-replace>{confirm_template}</template>
                     

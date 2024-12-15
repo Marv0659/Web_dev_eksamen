@@ -254,7 +254,7 @@ def validate_item_image(file):
 
 
 ##############################
-def send_verify_email(to_email, user_verification_key):
+def send_verify_email(user_email, user_verification_key):
     try:
         # Create a gmail fullflaskdemomail
         # Enable (turn on) 2 step verification/factor in the google account manager
@@ -266,7 +266,7 @@ def send_verify_email(to_email, user_verification_key):
         password = "crrn qrfi uusx cduj"  # If 2FA is on, use an App Password instead
 
         # Receiver email address
-        receiver_email = "wrathzeek@gmail.com"
+        receiver_email = user_email
         
         # Create the email message
         message = MIMEMultipart()
@@ -294,7 +294,7 @@ def send_verify_email(to_email, user_verification_key):
 
 
 ##############################
-def send_order_email(order_details):
+def send_order_email(order_details, user_email):
     try:
         # Create a gmail fullflaskdemomail
         # Enable (turn on) 2 step verification/factor in the google account manager
@@ -306,7 +306,7 @@ def send_order_email(order_details):
         password = "crrn qrfi uusx cduj"  # If 2FA is on, use an App Password instead
 
         # Receiver email address
-        receiver_email = "magnusmadsen2000@hotmail.com"
+        receiver_email = user_email
         
         # Create the email message
         message = MIMEMultipart()
@@ -345,7 +345,7 @@ def send_order_email(order_details):
         pass
 
 ##############################
-def send_block_email(to_email, type_of_block, item_or_user):
+def send_block_email(user_email, type_of_block, item_or_user):
     try:
         # Create a gmail fullflaskdemomail
         # Enable (turn on) 2 step verification/factor in the google account manager
@@ -357,7 +357,7 @@ def send_block_email(to_email, type_of_block, item_or_user):
         password = "qxea cqda veji leia"  # If 2FA is on, use an App Password instead
 
         # Receiver email address
-        receiver_email = "wrathzeek@gmail.com"
+        receiver_email = user_email
         
         # Create the email message
         message = MIMEMultipart()
@@ -384,7 +384,7 @@ def send_block_email(to_email, type_of_block, item_or_user):
         pass
 
 ##############################
-def send_partner_email(to_email, verification_key):
+def send_partner_email(user_email, verification_key):
     try:
         # Create a gmail fullflaskdemomail
         # Enable (turn on) 2 step verification/factor in the google account manager
@@ -396,7 +396,7 @@ def send_partner_email(to_email, verification_key):
         password = "crrn qrfi uusx cduj"  # If 2FA is on, use an App Password instead
 
         # Receiver email address
-        receiver_email = "wrathzeek@gmail.com"
+        receiver_email = user_email
         
         # Create the email message
         message = MIMEMultipart()
@@ -423,7 +423,7 @@ def send_partner_email(to_email, verification_key):
         pass
 ##############################
 
-def send_deletion_email(to_email):
+def send_deletion_email(user_email):
     try:
         # Configure your SMTP server settings
         # Create a gmail fullflaskdemomail
@@ -436,7 +436,7 @@ def send_deletion_email(to_email):
         password = "qxea cqda veji leia"  # If 2FA is on, use an App Password instead
 
         # Receiver email address
-        receiver_email = "wrathzeek@gmail.com"
+        receiver_email = user_email
         
         # Create the email message
         message = MIMEMultipart()
@@ -465,7 +465,7 @@ def send_deletion_email(to_email):
 
 
 ##############################
-def send_forgot_password(to_email, user_verification_key):
+def send_forgot_password(user_email, user_verification_key):
     try:
         # Configure your SMTP server settings
         # Create a gmail fullflaskdemomail
@@ -478,7 +478,7 @@ def send_forgot_password(to_email, user_verification_key):
         password = "qxea cqda veji leia"  # If 2FA is on, use an App Password instead
 
         # Receiver email address
-        receiver_email = "wrathzeek@gmail.com"
+        receiver_email = user_email
 
         message = MIMEMultipart()
         message["From"] = "Wolt"

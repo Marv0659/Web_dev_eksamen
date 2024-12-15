@@ -60,7 +60,7 @@ def view_index():
     if cart:
         for item in cart:
             cart_price += item["item_price"]
-    return render_template("view_index.html", user=user, cart_count=cart_count, cart_price=cart_price)
+    return render_template("view_index.html", user=user, cart_count=cart_count, cart_price=cart_price), 200
 
 ##############################
 @app.get("/restaurants")
@@ -82,7 +82,7 @@ def view_restaurants():
     if cart:
         for item in cart:
             cart_price += item["item_price"]
-    return render_template("view_restaurants.html", user=user, cart_price=cart_price, cart_count=cart_count, cart=cart, restaurant_users=restaurant_users, food_categories=food_categories)
+    return render_template("view_restaurants.html", user=user, cart_price=cart_price, cart_count=cart_count, cart=cart, restaurant_users=restaurant_users, food_categories=food_categories), 200
 
 ##############################
 @app.get("/explore")
@@ -106,7 +106,7 @@ def view_explore():
     if cart:
         for item in cart:
             cart_price += item["item_price"]
-    return render_template("view_explore.html", user=user, cart_price=cart_price, cart_count=cart_count, cart=cart, restaurant_users=restaurant_users)
+    return render_template("view_explore.html", user=user, cart_price=cart_price, cart_count=cart_count, cart=cart, restaurant_users=restaurant_users), 200
 
 ##############################
 @app.get("/signup")
@@ -115,16 +115,16 @@ def view_signup():
     ic(session)
     if session.get("user"):
         if len(session.get("user").get("roles")) > 1:
-            return redirect(url_for("view_choose_role")) 
+            return redirect(url_for("view_choose_role"), 302) 
         if "admin" in session.get("user").get("roles"):
-            return redirect(url_for("view_admin"))
+            return redirect(url_for("view_admin"), 302)
         if "customer" in session.get("user").get("roles"):
-            return redirect(url_for("view_customer")) 
+            return redirect(url_for("view_index"), 302) 
         if "partner" in session.get("user").get("roles"):
-            return redirect(url_for("view_partner"))  
+            return redirect(url_for("view_partner"), 302)  
         
      
-    return render_template("view_signup.html", x=x, title="Signup")
+    return render_template("view_signup.html", x=x, title="Signup"), 200
 
 
 
@@ -132,8 +132,9 @@ def view_signup():
 @app.get("/items/<item_pk>")
 def edit_item(item_pk):
     try:
-        if not session.get("user"): return redirect(url_for("view_login"))
-        if not "restaurant" in session.get("user").get("roles"): return redirect(url_for("view_login"))
+        user = session.get("user")
+        if not user: return redirect(url_for("view_login"), 302)
+        if not "restaurant" in session.get("user").get("roles"): return redirect(url_for("view_login"), 302)
         item_pk = x.validate_uuid4(item_pk)
 
         db, cursor = x.db()
@@ -153,7 +154,7 @@ def edit_item(item_pk):
             for item in cart:
                 cart_price += item["item_price"]
         
-        return render_template("view_edit_item.html", item=item, title="Edit Item", x=x, cart_count=cart_count, cart_price=cart_price)
+        return render_template("view_edit_item.html", item=item, user=user, title="Edit Item", x=x, cart_count=cart_count, cart_price=cart_price), 200
     except Exception as ex:
         ic(ex)
         if "db" in locals(): db.rollback()
@@ -179,19 +180,19 @@ def view_login():
     # print(session, flush=True)  
     if session.get("user"):
         if "admin" in session.get("user").get("roles"):
-            return redirect(url_for("view_admin"))
+            return redirect(url_for("view_admin"), 302)
         if "partner" in session.get("user").get("roles"):
-            return redirect(url_for("view_partner"))
+            return redirect(url_for("view_partner"), 302)
         if "restaurant" in session.get("user").get("roles"):
-            return redirect(url_for("view_restaurant_profile"))
+            return redirect(url_for("view_restaurant_profile"), 302)
         if "customer" in session.get("user").get("roles"):
-            return redirect(url_for("view_customer")) 
+            return redirect(url_for("view_index"), 302) 
 
     if session.get("new_user"):
         message=session.get("new_user", "")  
         session.pop("new_user")
-        return render_template("view_login.html", x=x, title="Login", message=message)
-    return render_template("view_login.html", x=x, title="Login")
+        return render_template("view_login.html", x=x, title="Login", message=message), 200
+    return render_template("view_login.html", x=x, title="Login"), 200
 
 
 
@@ -200,13 +201,13 @@ def view_login():
 @x.no_cache
 def view_customer():
     if not session.get("user", ""): 
-        return redirect(url_for("view_login"))
+        return redirect(url_for("view_login"), 302)
     user = session.get("user")
     ic(user)
     if "partner" in user["roles"]:
-        return redirect(url_for("view_partner"))
+        return redirect(url_for("view_partner"), 302)
     if "restaurant" in user["roles"]:
-        return redirect(url_for("view_restaurant_profile"))
+        return redirect(url_for("view_restaurant_profile"), 302)
     
     cart = session.get("cart")
     cart_count = len(cart) if cart else 0
@@ -214,17 +215,17 @@ def view_customer():
     if cart:
         for item in cart:
             cart_price += item["item_price"]
-    return render_template("view_customer.html", user=user, cart_count = cart_count, cart_price = cart_price)
+    return render_template("view_customer.html", user=user, cart_count = cart_count, cart_price = cart_price), 200
 
 ##############################
 @app.get("/partner")
 @x.no_cache
 def view_partner():
     if not session.get("user", ""): 
-        return redirect(url_for("view_login"))
+        return redirect(url_for("view_login"), 302)
     user = session.get("user")
     if not "partner" in user["roles"]:
-        return redirect(url_for("view_login"))
+        return redirect(url_for("view_login"), 302)
     cart = session.get("cart")
     cart_count = len(cart) if cart else 0
     cart_price = 0
@@ -232,7 +233,7 @@ def view_partner():
         for item in cart:
             cart_price += item["item_price"]
         
-    return render_template("view_partner.html", user=user, cart_count=cart_count, cart_price=cart_price)
+    return render_template("view_partner.html", user=user, cart_count=cart_count, cart_price=cart_price), 200
 
 
 ##############################
@@ -241,10 +242,10 @@ def view_partner():
 def view_admin():
     try:
         if not session.get("user", ""): 
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 302)
         user = session.get("user")
         if not "admin" in user.get("roles", ""):
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 302)
 
         db, cursor = x.db()
         
@@ -254,7 +255,7 @@ def view_admin():
         if cart:
             for item in cart:
                 cart_price += item["item_price"]
-        return render_template("view_admin.html", user=user, cart_count = cart_count, cart_price = cart_price)
+        return render_template("view_admin.html", user=user, cart_count = cart_count, cart_price = cart_price), 200
     
     
     except Exception as ex:
@@ -288,10 +289,10 @@ def view_admin_users():
         
     try:
         if not session.get("user", ""): 
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 302)
         user = session.get("user")
         if not "admin" in user.get("roles", ""):
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 302)
 
         db, cursor = x.db()
         
@@ -320,7 +321,7 @@ def view_admin_users():
             for item in cart:
                 cart_price += item["item_price"]
         
-        return render_template("view_admin_users.html", users=users, search_query=search_query, cart_count=cart_count, cart_price=cart_price)
+        return render_template("view_admin_users.html", user=user, users=users, search_query=search_query, cart_count=cart_count, cart_price=cart_price), 200
     
     
     except Exception as ex:
@@ -351,10 +352,10 @@ def view_admin_users():
 def view_admin_items():        
     try:
         if not session.get("user", ""): 
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 302)
         user = session.get("user")
         if not "admin" in user.get("roles", ""):
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 302)
 
         db, cursor = x.db()
         
@@ -384,7 +385,7 @@ def view_admin_items():
                 cart_price += item["item_price"]
         
 
-        return render_template("view_admin_items.html", user=user, items=items, search_query=search_query, cart_count=cart_count, cart_price=cart_price)
+        return render_template("view_admin_items.html", user=user, items=items, search_query=search_query, cart_count=cart_count, cart_price=cart_price), 200
     
     
     except Exception as ex:
@@ -418,9 +419,9 @@ def view_admin_items():
 @x.no_cache
 def view_items():
 
-
+    user=session.get("user")
     if not session.get("user", ""):
-        return redirect(url_for("view_login"))
+        return redirect(url_for("view_login"), 302)
     
     db, cursor = x.db()
 
@@ -443,7 +444,7 @@ def view_items():
             cart_price += item["item_price"]
         
 
-    return render_template("view_items.html", items=items, cart_price=cart_price, cart_count=cart_count)
+    return render_template("view_items.html", user=user, items=items, cart_price=cart_price, cart_count=cart_count), 200
 
 ##############################
 @app.get("/restaurant/items")
@@ -478,7 +479,7 @@ def view_restaurant_items():
                 cart_price += item["item_price"]
         
 
-        return render_template("view_restaurant_items.html", items=items, title="My Items", cart_count=cart_count, cart_price=cart_price)
+        return render_template("view_restaurant_items.html", user=user, items=items, title="My Items", cart_count=cart_count, cart_price=cart_price), 200
 
     except Exception as ex:
         ic(ex)
@@ -494,17 +495,17 @@ def view_restaurant_items():
 def view_verify_partner():
 
     if not session.get("user", ""): 
-        return redirect(url_for("view_login"))
+        return redirect(url_for("view_login"), 302)
     user = session.get("user")
     if "partner" in user["roles"]:
-        return redirect(url_for("view_login"))
+        return redirect(url_for("view_login"), 302)
     cart = session.get("cart")
     cart_count = len(cart) if cart else 0
     cart_price = 0
     if cart:
         for item in cart:
             cart_price += item["item_price"]
-    return render_template("view_verify_partner.html", user=user, cart_count = cart_count, cart_price = cart_price, x=x)
+    return render_template("view_verify_partner.html", user=user, cart_count = cart_count, cart_price = cart_price, x=x), 200
     
 
 ##############################
@@ -512,10 +513,10 @@ def view_verify_partner():
 def view_create_resturant():
     ic("CREATE RESTURANT")
     if not session.get("user", ""):
-        return redirect(url_for("view_login"))
+        return redirect(url_for("view_login"), 302)
     user = session.get("user")
     if "restaurant" in user["roles"] or "partner" in user["roles"]:
-        return redirect(url_for("view_login"))
+        return redirect(url_for("view_login"), 302)
    
     cart = session.get("cart")
     cart_count = len(cart) if cart else 0
@@ -523,7 +524,7 @@ def view_create_resturant():
     if cart:
         for item in cart:
             cart_price += item["item_price"]
-    return render_template("view_create_resturant.html", user=user, cart_count = cart_count, cart_price = cart_price, x=x)
+    return render_template("view_create_resturant.html", user=user, cart_count = cart_count, cart_price = cart_price, x=x), 200
 
 
 ##############################
@@ -531,10 +532,10 @@ def view_create_resturant():
 @x.no_cache
 def view_new_item():
     if not session.get("user", ""): 
-        return redirect(url_for("view_login"))
+        return redirect(url_for("view_login"), 302)
     user = session.get("user")
     if not "restaurant" in user.get("roles", ""):
-        return redirect(url_for("view_login"))
+        return redirect(url_for("view_login"), 302)
     user = session.get("user")
     cart = session.get("cart")
     cart_count = len(cart) if cart else 0
@@ -542,7 +543,7 @@ def view_new_item():
     if cart:
         for item in cart:
             cart_price += item["item_price"]
-    return render_template("view_create_item.html", user=user, title="New item", x=x, cart_count=cart_count, cart_price=cart_price)
+    return render_template("view_create_item.html", user=user, title="New item", x=x, cart_count=cart_count, cart_price=cart_price), 200
 
 ##############################
 @app.get("/<user_pk>/items")
@@ -568,7 +569,7 @@ def view_customer_restaurant_items(user_pk):
     if cart:
         for item in cart:
             cart_price += item["item_price"]
-    return render_template("view_customer_restaurant_items.html", user=user, cart_count=cart_count, cart_price=cart_price, restaurant_items=restaurant_items, restaurant_user=restaurant_user, random_image=random_image)
+    return render_template("view_customer_restaurant_items.html", user=user, cart_count=cart_count, cart_price=cart_price, restaurant_items=restaurant_items, restaurant_user=restaurant_user, random_image=random_image), 200
 
 ##############################
 @app.get("/item/<item_pk>")
@@ -590,12 +591,12 @@ def view_item(item_pk):
     if cart:
         for item in cart:
             cart_price += item["item_price"]
-    return render_template("view_item.html", user=user, dish_item=dish_item, cart=cart, cart_price=cart_price, random_image=random_image, cart_count=cart_count)
+    return render_template("view_item.html", user=user, dish_item=dish_item, cart=cart, cart_price=cart_price, random_image=random_image, cart_count=cart_count), 200
 ##############################
 
 @app.get("/forgot-password")
 def view_forgot_password():
-    return render_template("view_forgot_password.html", title="Forgot Password")
+    return render_template("view_forgot_password.html", title="Forgot Password"), 200
 
 ##############################
 
@@ -607,7 +608,7 @@ def view_reset_password(user_verification_key):
     user = cursor.fetchone()
     if not user:
         return "User not found", 404
-    return render_template("view_reset_password.html", user_verification_key=user_verification_key, title="Reset Password", x=x)
+    return render_template("view_reset_password.html", user_verification_key=user_verification_key, title="Reset Password", x=x), 200
 
 
 
@@ -617,10 +618,10 @@ def view_reset_password(user_verification_key):
 def view_restaurant_profile():
     try:
         if not session.get("user", ""): 
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 302)
         user = session.get("user")
         if not "restaurant" in user.get("roles", ""):
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 302)
         db, cursor = x.db()
         query = """
             SELECT user_name, user_email
@@ -636,7 +637,7 @@ def view_restaurant_profile():
             for item in cart:
                 cart_price += item["item_price"]
         
-        return render_template("view_restaurant_profile.html", user=user, title="Restaurant Profile", x=x, cart_count=cart_count, cart_price=cart_price)
+        return render_template("view_restaurant_profile.html", user=user, title="Restaurant Profile", x=x, cart_count=cart_count, cart_price=cart_price), 200
     except Exception as ex:
         if "db" in locals():
             db.rollback()
@@ -655,7 +656,7 @@ def view_restaurant_profile():
 def view_edit_restaurant_profile():
     user = session.get("user")
     if not user: 
-        return redirect(url_for("view_login"))
+        return redirect(url_for("view_login"), 302)
    
     
     cart = session.get("cart")
@@ -665,7 +666,7 @@ def view_edit_restaurant_profile():
         for item in cart:
             cart_price += item["item_price"]
         
-    return render_template("view_edit_restaurant_profile.html", user=user, title="Edit Restaurant Profile", x=x, cart_count=cart_count, cart_price=cart_price)
+    return render_template("view_edit_restaurant_profile.html", user=user, title="Edit Restaurant Profile", x=x, cart_count=cart_count, cart_price=cart_price), 200
 
 
 ##############################
@@ -679,9 +680,9 @@ def view_checkout():
         for item in cart:
             cart_price += item["item_price"]
     if not user: 
-        return redirect(url_for("view_login"))
+        return redirect(url_for("view_login"), 302)
     if not cart:
-        return redirect(url_for("view_restaurants"))
+        return redirect(url_for("view_restaurants"), 302)
 
     return render_template("view_checkout.html", user=user, title="Checkout", cart=cart, cart_price=cart_price, cart_count=cart_count)
 
@@ -696,8 +697,8 @@ def confirm_delete_restaurant():
             for item in cart:
                 cart_price += item["item_price"]
         if not user:
-            return redirect(url_for("view_login"))
-        return render_template("confirm_delete_profile.html", title="Delete Profile", x=x, user=user, cart_count=cart_count, cart_price=cart_price)
+            return redirect(url_for("view_login"), 302)
+        return render_template("confirm_delete_profile.html", title="Delete Profile", x=x, user=user, cart_count=cart_count, cart_price=cart_price), 200
    
 
 ##############################
@@ -707,9 +708,9 @@ def view_order_confirmed():
     user = session.get("user")
     cart_items = session.get("cart")
     if not cart_items:
-        return redirect(url_for("view_restaurants"))
+        return redirect(url_for("view_restaurants"), 302)
     session.pop("cart")
-    confirmed_template = render_template("view_order_confirmed.html", user=user, cart_items=cart_items, title="Order Confirmed")
+    confirmed_template = render_template("view_order_confirmed.html", user=user, cart_items=cart_items, title="Order Confirmed"), 200
     toast = render_template("___toast_success.html", message="Order confirmed. An email has been sent to you")
     return f"""<template mix-target="#checkoutBody" mix-replace>{confirmed_template}</template>
                 <template mix-target="#toast" mix-bottom>{toast}</template>
@@ -752,6 +753,7 @@ def view_restaurant_by_category(food_category_pk):
 @app.get("/view-all")
 def view_all():
     search_query = request.args.get('search', '').strip()
+    user = session.get("user")
     db, cursor = x.db()
     if search_query:
         # Modify query to include search functionality
@@ -781,7 +783,7 @@ def view_all():
 
 
     
-    return render_template("view_all.html", search_query=search_query, items=items, restaurants=restaurants)
+    return render_template("view_all.html", search_query=search_query, user=user, items=items, restaurants=restaurants), 200
 ##############################
 
 ##############################API_GET_ROUTE##############################
@@ -817,7 +819,7 @@ def add_resturant():
     try:
 
         if not session.get("user", ""):
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 303)
         
         resturant_name = x.validate_resturant_name()
         resturant_category = x.validate_resturant_category()
@@ -939,7 +941,7 @@ def send_partner_verification(user_pk):
         
         # VALIDATION
         if not session.get("user", ""): 
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 303)
 
         
 
@@ -1051,7 +1053,7 @@ def logout():
     # Explicitly print the redirect URL
     print(f"Redirecting to: {url_for('view_login')}")
     
-    return redirect(url_for("view_login"))
+    return redirect(url_for("view_login"), 303)
 
 ##############################
 @app.post("/reset-password/<user_verification_key>")
@@ -1220,7 +1222,7 @@ def login():
 
         session["user"] = user
 
-        if len(roles) == 1:
+        if len(roles) == 1 and roles[0] != "customer":
             return f"""<template mix-redirect="/{roles[0]}"></template>"""
         return f"""<template mix-redirect="/"></template>"""
         # db.commit()
@@ -1316,12 +1318,12 @@ def create_item():
     try:
         # Ensure the user is logged in
         if not session.get("user"):
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 303)
 
         # Ensure the user has the 'restaurant' role
         user_roles = session.get("user").get("roles", [])
         if "restaurant" not in user_roles:
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 303)
 
         # Validate textual fields using functions from x.py
         item_title = x.validate_item_title()
@@ -1426,13 +1428,19 @@ def send_order_email(user_pk):
         db, cursor = x.db()
         q = "SELECT * FROM users WHERE user_pk = %s"
         cursor.execute(q, (user_pk,))
+        cart = session.get("cart")
         user = cursor.fetchone()
         toast = render_template("___toast_success.html", message="An email has been sent to you with your order details.")
-        x.send_order_email()
-        return redirect(url_for("view_order_confirmed"))
+        x.send_order_email(cart)
+        return redirect(url_for("view_order_confirmed"), 303)
     except Exception as ex:
         ic(ex)
         return "Error sending mail", 500
+    finally:
+        if "cursor" in locals():
+            cursor.close()
+        if "db" in locals():
+            db.close()
 
 
 ##############################
@@ -1485,7 +1493,7 @@ def user_update():
 @app.put("/users/block/<user_pk>")
 def user_block(user_pk):
     try:        
-        if not "admin" in session.get("user").get("roles"): return redirect(url_for("view_login"))
+        if not "admin" in session.get("user").get("roles"): return redirect(url_for("view_login"), 303)
         user_pk = x.validate_uuid4(user_pk)
         user_blocked_at = int(time.time())
         db, cursor = x.db()
@@ -1524,7 +1532,7 @@ def user_block(user_pk):
 def item_block(item_pk):
     try:
         if not "admin" in session.get("user").get("roles"):
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 303)
         
         item_pk = x.validate_uuid4(item_pk)
         item_blocked_at = int(time.time())
@@ -1582,7 +1590,7 @@ def item_block(item_pk):
 @app.put("/users/unblock/<user_pk>")
 def user_unblock(user_pk):
     try:
-        if not "admin" in session.get("user").get("roles"): return redirect(url_for("view_login"))
+        if not "admin" in session.get("user").get("roles"): return redirect(url_for("view_login"), 303)
         user_pk = x.validate_uuid4(user_pk)
         user_blocked_at = 0
         db, cursor = x.db()
@@ -1620,9 +1628,9 @@ def user_unblock(user_pk):
 def delete_restaurant():
     try:
         if not session.get("user"):
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 303)
         if not "restaurant" in session.get("user").get("roles"): 
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 303)
         
         user_pk = session.get("user").get("user_pk")
         user_email = session.get("user").get("user_email")
@@ -1677,7 +1685,7 @@ def delete_restaurant():
 def item_unblock(item_pk):
     try:
         if not "admin" in session.get("user").get("roles"): 
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 303)
         
         item_pk = x.validate_uuid4(item_pk)
         item_blocked_at = 0
@@ -1738,11 +1746,11 @@ def update_item(item_pk):
     try:
         # Ensure the user is logged in
         if not session.get("user", ""):
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 303)
         
         # Ensure the user has the 'restaurant' role
         if not "restaurant" in session.get("user").get("roles", []):
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 303)
         
         # Validate the item title, description, and price
         item_title = x.validate_item_title()
@@ -1903,9 +1911,9 @@ def _________DELETE_________(): pass
 def user_delete(user_pk):
     try:
         # Check if user is logged
-        if not session.get("user", ""): return redirect(url_for("view_login"))
+        if not session.get("user", ""): return redirect(url_for("view_login"), 303)
         # Check if it is an admin
-        if not "admin" in session.get("user").get("roles"): return redirect(url_for("view_login"))
+        if not "admin" in session.get("user").get("roles"): return redirect(url_for("view_login"), 303)
         user_pk = x.validate_uuid4(user_pk)
         user_deleted_at = int(time.time())
         db, cursor = x.db()
@@ -1937,9 +1945,9 @@ def user_delete(user_pk):
 def delete_item(item_pk):
     try:
         if not session.get("user"):
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 303)
         if not "restaurant" in session.get("user").get("roles"): 
-            return redirect(url_for("view_login"))
+            return redirect(url_for("view_login"), 303)
         item_pk = x.validate_uuid4(item_pk)
         db, cursor = x.db()
         q = 'DELETE FROM items WHERE item_pk = %s'
@@ -1994,7 +2002,7 @@ def verify_user(verification_key):
         cursor.execute(q, (user_verified_at, verification_key))
         if cursor.rowcount != 1: x.raise_custom_exception("cannot verify account", 400)
         db.commit()
-        return redirect(url_for("view_login", message="User verified, please login"))
+        return redirect(url_for("view_login", message="User verified, please login"), 303)
 
     except Exception as ex:
         ic(ex)

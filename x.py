@@ -1,4 +1,4 @@
-from flask import request, make_response
+from flask import request, make_response, url_for
 from functools import wraps
 import mysql.connector
 import re
@@ -282,7 +282,7 @@ def send_verify_email(to_email, user_verification_key):
 
 
 ##############################
-def send_order_email():
+def send_order_email(order_details):
     try:
         # Create a gmail fullflaskdemomail
         # Enable (turn on) 2 step verification/factor in the google account manager
@@ -294,7 +294,7 @@ def send_order_email():
         password = "crrn qrfi uusx cduj"  # If 2FA is on, use an App Password instead
 
         # Receiver email address
-        receiver_email = "wrathzeek@gmail.com"
+        receiver_email = "magnusmadsen2000@hotmail.com"
         
         # Create the email message
         message = MIMEMultipart()
@@ -302,8 +302,20 @@ def send_order_email():
         message["To"] = receiver_email
         message["Subject"] = "WWWolt order details"
 
-        # Body of the email
-        body = f"""Your order details: 1x burger, 1x fries, 1x coke"""
+        body = "<h1>Your order has been placed successfully!</h1>"
+
+        
+        # Iterate through order_details
+        for item in order_details:
+            body += f"""
+                <p class="bg-c-black">
+                    {item.get('item_title', 'N/A')} - ${item.get('item_price', 'N/A')}
+                </p>
+              
+                
+            """
+        
+
         message.attach(MIMEText(body, "html"))
 
         # Connect to Gmail's SMTP server and send the email

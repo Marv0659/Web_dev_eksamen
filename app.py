@@ -1650,8 +1650,7 @@ def delete_restaurant():
     try:
         if not session.get("user"):
             return redirect(url_for("view_login"), 303)
-        if not "restaurant" in session.get("user").get("roles"): 
-            return redirect(url_for("view_login"), 303)
+
         
         user_pk = session.get("user").get("user_pk")
         user_email = session.get("user").get("user_email")

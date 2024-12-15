@@ -1295,8 +1295,7 @@ def login():
 
         session["user"] = user
 
-        if len(roles) == 1 and roles[0] != "customer":
-            return f"""<template mix-redirect="/{roles[0]}"></template>"""
+       
         return f"""<template mix-redirect="/"></template>"""
         # db.commit()
     

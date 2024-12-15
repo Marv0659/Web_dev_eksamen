@@ -13,7 +13,7 @@
 </head>
 
 <body class="w-full h-100vh text-c-gray:-16">
-    <header class="px-5 border-b-1 border-c-gray:+16 p-sticky">
+    <header class="px-5 border-b-1 border-c-gray:+16 p-sticky z-100">
         <nav class="d-none my-2 j-content-between p-5" md="d-flex">
             <a href="{{ url_for('view_restaurants') }}" class="text-c-black text-w-bold text-xl my-auto">WWWolt</a>
             <form method="get" action="{{url_for('view_all', search_query=search_query)}}" class="d-flex gap-2">
@@ -44,7 +44,7 @@
                 <div class="w-10 h-2 bg-c-blue:+1 rounded-4"></div>
                 <div class="w-10 h-2 bg-c-blue:+1 rounded-4"></div>
             </div>
-            <div class="d-none p-absolute top-0 w-half  bg-c-white h-fullvh border-l-1 border-c-gray:+16 right--200 ts-f-ease-in" id="burger">
+            <div class="d-none p-fixed pt-4 z-100 top-0 w-half  bg-c-white h-fullvh border-l-1 border-c-gray:+16 right--200 ts-f-ease-in" id="burger">
                 <div class="d-flex j-content-end px-5 my-2">
 
                     <div class="d-grid" id="burger_close">

@@ -1,6 +1,6 @@
 {% include "_top.html" %}
 
-<main class="w-full px-5 flex justify-center items-center">
+<main class="w-full px-5 flex justify-center items-center min-h-fullvh">
     <!-- Product Card Container -->
     <div class="card d-grid cols-1 w-full max-w-2xl rounded-4 shadow-lg shadow-c-black:+80 overflow-hidden mt-10 pa-2 gap-4" md="cols-2">
         <!-- Image Section -->
@@ -26,7 +26,7 @@
             <div>
                 {% if user %}
                     <button 
-                        class="w-full cursor-pointer bg-c-blue:+1 rounded-3 text-c-white text-w-semibold hover:bg-c-blue:-1"
+                        class="w-full cursor-pointer bg-c-blue:+1 rounded-3 text-c-white text-w-semibold"
                         mix-post="/set-item-cookie/{{dish_item.item_pk}}"
                         mix-data="#cart"
                     >
@@ -35,9 +35,9 @@
                 </div>
 
                 {% else %}
-                    <a 
-                        href="/login" 
-                        class="w-full text-center cursor-pointer bg-c-blue:+1  rounded-3 text-c-white text-w-semibold hover:bg-c-blue:-1"
+                    <a  
+                        class="w-full d-block text-a-center text-100 pa-2 cursor-pointer bg-c-blue:+1 rounded-3 text-c-white text-w-semibold"
+                        href="/login"
                     >
                         Login to Buy
                     </a>

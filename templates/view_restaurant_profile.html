@@ -28,11 +28,11 @@
 
     </section>
 
-    <div class="profile-actions d-flex gap-2 mt-4">
-        <a href="{{ url_for('view_edit_restaurant_profile') }}" class="btn">Edit Profile</a>
-        <a href="{{ url_for('confirm_delete_restaurant') }}" class="btn btn-danger">Delete Profile</a>
-        <a href="{{url_for('view_new_item')}}">Add new item</a>
-        <a href="{{url_for('view_restaurant_items')}}">View all your items</a>
+    <div class="d-flex flex-wrap gap-2 my-5 ml-5">
+        <a href="{{url_for('view_new_item')}}" class="text-c-white text-w-semibold text-lg bg-c-blue:+1 w-full px-4 py-2 rounded-2 w-fit-content">Add new item</a>
+        <a href="{{url_for('view_restaurant_items')}}" class="text-c-white text-w-semibold text-lg bg-c-blue:+1 w-full px-4 py-2 rounded-2 w-fit-content">View all your items</a>
+        <a href="{{ url_for('view_edit_restaurant_profile') }}" class="text-c-white text-w-semibold text-lg bg-c-gray w-full px-4 py-2 rounded-2 w-fit-content">Edit Profile</a>
+        <a href="{{ url_for('confirm_delete_restaurant') }}" class="text-c-white text-w-semibold text-lg bg-c-red:+1 w-full px-4 py-2 rounded-2 w-fit-content">Delete Profile</a>
 
     </div>
 

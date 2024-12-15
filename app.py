@@ -65,24 +65,50 @@ def view_index():
 ##############################
 @app.get("/restaurants")
 def view_restaurants():
-    # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
-    db, cursor = x.db()
-    q = """ SELECT * FROM restaurant_info """
-    cursor.execute(q)
-    restaurant_users = cursor.fetchall()
-    q = """ SELECT * FROM food_categories"""
-    cursor.execute(q)
-    food_categories = cursor.fetchall()
-    cursor.close()
-    db.close()
-    user = session.get("user")
-    cart = session.get("cart")
-    cart_count = len(cart) if cart else 0
-    cart_price = 0
-    if cart:
-        for item in cart:
-            cart_price += item["item_price"]
-    return render_template("view_restaurants.html", user=user, cart_price=cart_price, cart_count=cart_count, cart=cart, restaurant_users=restaurant_users, food_categories=food_categories), 200
+    
+        try:
+            
+            db, cursor = x.db()
+            q = """ SELECT * FROM restaurant_info """
+            cursor.execute(q)
+            restaurant_users = cursor.fetchall()
+            q = """ SELECT * FROM food_categories"""
+            cursor.execute(q)
+            food_categories = cursor.fetchall()
+            cursor.close()
+            db.close()
+            user = session.get("user")
+            cart = session.get("cart")
+            cart_count = len(cart) if cart else 0
+            cart_price = 0
+            if cart:
+                for item in cart:
+                    cart_price += item["item_price"]
+            return render_template("view_restaurants.html", user=user, cart_price=cart_price, cart_count=cart_count, cart=cart, restaurant_users=restaurant_users, food_categories=food_categories), 200
+        
+        except Exception as ex:
+    
+            ic(ex)
+            if "db" in locals(): db.rollback()
+    
+            # My own exception
+            if isinstance(ex, x.CustomException):
+                return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
+            
+            # Database exception
+            if isinstance(ex, x.mysql.connector.Error):
+                ic(ex)
+                if "users.user_email" in str(ex):
+                    return """<template mix-target="#toast" mix-bottom>email not available</template>""", 400
+                return "<template>System upgrading</template>", 500  
+          
+            # Any other exception
+            return """<template mix-target="#toast" mix-bottom>System under maintenance</template>""", 500  
+        
+        finally:
+            if "cursor" in locals(): cursor.close()
+            if "db" in locals(): db.close()
+    
 
 ##############################
 @app.get("/explore")
@@ -425,33 +451,58 @@ def view_admin_items():
 @app.get("/items")
 @x.no_cache
 def view_items():
+        try:
+            
+            user=session.get("user")
+            if not session.get("user", ""):
+                return redirect(url_for("view_login"), 302)
+            
+            db, cursor = x.db()
 
-    user=session.get("user")
-    if not session.get("user", ""):
-        return redirect(url_for("view_login"), 302)
-    
-    db, cursor = x.db()
+            query = """
+                    SELECT items.item_title, items.item_price,items.item_description, items.item_image, users.user_name AS restaurant_name
+                    FROM items
+                    JOIN users ON items.item_user_fk = users.user_pk
+                    JOIN users_roles ON users.user_pk = users_roles.user_role_user_fk
+                    WHERE users_roles.user_role_role_fk = %s
+                """
+            
+            cursor.execute(query, (x.RESTAURANT_ROLE_PK,))
+            items = cursor.fetchall()
 
-    query = """
-            SELECT items.item_title, items.item_price,items.item_description, items.item_image, users.user_name AS restaurant_name
-            FROM items
-            JOIN users ON items.item_user_fk = users.user_pk
-            JOIN users_roles ON users.user_pk = users_roles.user_role_user_fk
-            WHERE users_roles.user_role_role_fk = %s
-        """
-    
-    cursor.execute(query, (x.RESTAURANT_ROLE_PK,))
-    items = cursor.fetchall()
+            cart = session.get("cart")
+            cart_count = len(cart) if cart else 0
+            cart_price = 0
+            if cart:
+                for item in cart:
+                    cart_price += item["item_price"]
+                
 
-    cart = session.get("cart")
-    cart_count = len(cart) if cart else 0
-    cart_price = 0
-    if cart:
-        for item in cart:
-            cart_price += item["item_price"]
+            return render_template("view_items.html", user=user, items=items, cart_price=cart_price, cart_count=cart_count), 200
         
-
-    return render_template("view_items.html", user=user, items=items, cart_price=cart_price, cart_count=cart_count), 200
+        except Exception as ex:
+    
+            ic(ex)
+            if "db" in locals(): db.rollback()
+    
+            # My own exception
+            if isinstance(ex, x.CustomException):
+                return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
+            
+            # Database exception
+            if isinstance(ex, x.mysql.connector.Error):
+                ic(ex)
+                if "users.user_email" in str(ex):
+                    return """<template mix-target="#toast" mix-bottom>email not available</template>""", 400
+                return "<template>System upgrading</template>", 500  
+          
+            # Any other exception
+            return """<template mix-target="#toast" mix-bottom>System under maintenance</template>""", 500  
+        
+        finally:
+            if "cursor" in locals(): cursor.close()
+            if "db" in locals(): db.close()
+    
 
 ##############################
 @app.get("/restaurant/items")
@@ -581,24 +632,54 @@ def view_customer_restaurant_items(user_pk):
 ##############################
 @app.get("/item/<item_pk>")
 def view_item(item_pk):
-    # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
-    random_image = request.args.get("image", default=None)
-    db, cursor = x.db()
-    q = """ SELECT * FROM items 
-            WHERE item_pk = %s
-            """
-    cursor.execute(q, (item_pk,))
-    dish_item = cursor.fetchone()
-    cursor.close()
-    db.close()
-    user = session.get("user")
-    cart = session.get("cart")
-    cart_count = len(cart) if cart else 0
-    cart_price = 0
-    if cart:
-        for item in cart:
-            cart_price += item["item_price"]
-    return render_template("view_item.html", user=user, dish_item=dish_item, cart=cart, cart_price=cart_price, random_image=random_image, cart_count=cart_count), 200
+
+        try:
+            
+            # make a variable that contains all users that has the role restaurant in the database and pass it to the template 
+            random_image = request.args.get("image", default=None)
+            db, cursor = x.db()
+            q = """ SELECT * FROM items 
+                    WHERE item_pk = %s
+                    """
+            cursor.execute(q, (item_pk,))
+            dish_item = cursor.fetchone()
+            cursor.close()
+            db.close()
+            user = session.get("user")
+            cart = session.get("cart")
+            cart_count = len(cart) if cart else 0
+            cart_price = 0
+            if cart:
+                for item in cart:
+                    cart_price += item["item_price"]
+            return render_template("view_item.html", user=user, dish_item=dish_item, cart=cart, cart_price=cart_price, random_image=random_image, cart_count=cart_count), 200
+        
+        except Exception as ex:
+    
+            ic(ex)
+            if "db" in locals(): db.rollback()
+    
+            # My own exception
+            if isinstance(ex, x.CustomException):
+                return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
+            
+            # Database exception
+            if isinstance(ex, x.mysql.connector.Error):
+                ic(ex)
+                if "users.user_email" in str(ex):
+                    return """<template mix-target="#toast" mix-bottom>email not available</template>""", 400
+                return "<template>System upgrading</template>", 500  
+          
+            # Any other exception
+            return """<template mix-target="#toast" mix-bottom>System under maintenance</template>""", 500  
+        
+        finally:
+            if "cursor" in locals(): cursor.close()
+            if "db" in locals(): db.close()
+    
+
+
+    
 ##############################
 
 @app.get("/forgot-password")
@@ -1847,9 +1928,9 @@ def update_profile():
         # Get form data
         user_name = x.validate_user_name()
         user_email = x.validate_user_email()
-        current_password = request.form.get("current_password", "")
-        new_password = request.form.get("new_password", "")
-        confirm_password = request.form.get("confirm_password", "")
+        current_password = x.validate_user_current_password()
+        new_password = x.validate_new_user_password()
+        confirm_password = x.validate_user_confirm_new_password()
 
 
         db, cursor = x.db()
@@ -1866,7 +1947,7 @@ def update_profile():
 
         # Validate and update email
         if user_email != user_data['user_email']:
-            if not x.validate_email(user_email):
+            if not x.validate_email():
                 x.raise_custom_exception("Invalid email address", 400)
             # Check if email is already taken
             cursor.execute("SELECT user_pk FROM users WHERE user_email = %s", (user_email,))
@@ -1883,7 +1964,7 @@ def update_profile():
                 x.raise_custom_exception("Current password is incorrect", 401)
             if new_password != confirm_password:
                 x.raise_custom_exception("New passwords do not match", 400)
-            if not x.validate_new_user_password(new_password):
+            if not x.validate_new_user_password():
                 x.raise_custom_exception("Password does not meet requirements", 400)
             new_password_hash = generate_password_hash(new_password)
         else:

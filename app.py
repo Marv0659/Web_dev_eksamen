@@ -145,7 +145,15 @@ def edit_item(item_pk):
         cursor.execute(q, (item_pk,))
         item = cursor.fetchone()
         if not item: return "item not found", 404
-        return render_template("view_edit_item.html", item=item, title="Edit Item", x=x)
+
+        cart = session.get("cart")
+        cart_count = len(cart) if cart else 0
+        cart_price = 0
+        if cart:
+            for item in cart:
+                cart_price += item["item_price"]
+        
+        return render_template("view_edit_item.html", item=item, title="Edit Item", x=x, cart_count=cart_count, cart_price=cart_price)
     except Exception as ex:
         ic(ex)
         if "db" in locals(): db.rollback()
@@ -217,7 +225,14 @@ def view_partner():
     user = session.get("user")
     if not "partner" in user["roles"]:
         return render_template(url_for("view_login"))
-    return render_template("view_partner.html", user=user)
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+        
+    return render_template("view_partner.html", user=user, cart_count=cart_count, cart_price=cart_price)
 
 
 ##############################
@@ -298,8 +313,14 @@ def view_admin_users():
             cursor.execute(q)
 
         users = cursor.fetchall()
-
-        return render_template("view_admin_users.html", users=users, search_query=search_query)
+        cart = session.get("cart")
+        cart_count = len(cart) if cart else 0
+        cart_price = 0
+        if cart:
+            for item in cart:
+                cart_price += item["item_price"]
+        
+        return render_template("view_admin_users.html", users=users, search_query=search_query, cart_count=cart_count, cart_price=cart_price)
     
     
     except Exception as ex:
@@ -355,7 +376,15 @@ def view_admin_items():
 
         items = cursor.fetchall()
 
-        return render_template("view_admin_items.html", user=user, items=items, search_query=search_query)
+        cart = session.get("cart")
+        cart_count = len(cart) if cart else 0
+        cart_price = 0
+        if cart:
+            for item in cart:
+                cart_price += item["item_price"]
+        
+
+        return render_template("view_admin_items.html", user=user, items=items, search_query=search_query, cart_count=cart_count, cart_price=cart_price)
     
     
     except Exception as ex:
@@ -406,7 +435,15 @@ def view_items():
     cursor.execute(query, (x.RESTAURANT_ROLE_PK,))
     items = cursor.fetchall()
 
-    return render_template("view_items.html", items=items)
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+        
+
+    return render_template("view_items.html", items=items, cart_price=cart_price, cart_count=cart_count)
 
 ##############################
 @app.get("/restaurant/items")
@@ -433,7 +470,15 @@ def view_restaurant_items():
         cursor.execute(query_items, (user_pk,))
         items = cursor.fetchall()
 
-        return render_template("view_restaurant_items.html", items=items, title="My Items")
+        cart = session.get("cart")
+        cart_count = len(cart) if cart else 0
+        cart_price = 0
+        if cart:
+            for item in cart:
+                cart_price += item["item_price"]
+        
+
+        return render_template("view_restaurant_items.html", items=items, title="My Items", cart_count=cart_count, cart_price=cart_price)
 
     except Exception as ex:
         ic(ex)
@@ -498,20 +543,6 @@ def view_new_item():
         for item in cart:
             cart_price += item["item_price"]
     return render_template("view_create_item.html", user=user, title="New item", x=x, cart_count=cart_count, cart_price=cart_price)
-
-
-
-
-##############################
-@app.get("/choose-role")
-@x.no_cache
-def view_choose_role():
-    if not session.get("user", ""): 
-        return redirect(url_for("view_login"))
-    if not len(session.get("user").get("roles")) >= 2:
-        return redirect(url_for("view_login"))
-    user = session.get("user")
-    return render_template("view_choose_role.html", user=user, title="Choose role")
 
 ##############################
 @app.get("/<user_pk>/items")
@@ -598,7 +629,14 @@ def view_restaurant_profile():
         """
         cursor.execute(query, (user.get("user_pk"),))
         user = cursor.fetchone()
-        return render_template("view_restaurant_profile.html", user=user, title="Restaurant Profile", x=x)
+        cart = session.get("cart")
+        cart_count = len(cart) if cart else 0
+        cart_price = 0
+        if cart:
+            for item in cart:
+                cart_price += item["item_price"]
+        
+        return render_template("view_restaurant_profile.html", user=user, title="Restaurant Profile", x=x, cart_count=cart_count, cart_price=cart_price)
     except Exception as ex:
         if "db" in locals():
             db.rollback()
@@ -620,7 +658,15 @@ def view_edit_restaurant_profile():
     user = session.get("user")
     if not "restaurant" in user.get("roles", ""):
         return redirect(url_for("view_login"))
-    return render_template("view_edit_restaurant_profile.html", user=user, title="Edit Restaurant Profile", x=x)
+    
+    cart = session.get("cart")
+    cart_count = len(cart) if cart else 0
+    cart_price = 0
+    if cart:
+        for item in cart:
+            cart_price += item["item_price"]
+        
+    return render_template("view_edit_restaurant_profile.html", user=user, title="Edit Restaurant Profile", x=x, cart_count=cart_count, cart_price=cart_price)
 
 
 ##############################
@@ -1178,7 +1224,7 @@ def login():
 
         if len(roles) == 1:
             return f"""<template mix-redirect="/{roles[0]}"></template>"""
-        return f"""<template mix-redirect="/choose-role"></template>"""
+        return f"""<template mix-redirect="/"></template>"""
         # db.commit()
     
     except Exception as ex:

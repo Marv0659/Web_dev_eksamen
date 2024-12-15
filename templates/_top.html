@@ -80,7 +80,11 @@
             </div>
         </nav>
     </header>
-    <div id="toast" class="d-flex flex-col j-content-center p-fixed w-full top-4 z-10 pointer-e-none"></div>
+    <div id="toast" class="d-flex flex-col j-content-center p-fixed w-full top-4 z-100 pointer-e-none">
+    {% if message %}
+        {%include "___toast_success.html"%}
+    {% endif %}
+    </div>
 
     <script>
         document.querySelector("#burger_toggle").addEventListener("click", () => {

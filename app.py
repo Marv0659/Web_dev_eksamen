@@ -1211,11 +1211,6 @@ def login():
         cursor.execute(q, (user_email,))
         rows = cursor.fetchall()
 
-        # print("Number of rows found:", len(rows))
-        # if rows:
-        #     print("Found user details:", rows[0])
-        # else:
-        #     print("No user found with email:", user_email)
 
         print("Number of rows found:", len(rows)==0)
         if not rows:
@@ -1230,7 +1225,7 @@ def login():
             toast = render_template("___toast.html", message="invalid credentials")
             return f"""<template mix-target="#toast">{toast}</template>""", 401
         
-        if rows[0]["user_deleted_at"] == 0:
+        if rows[0]["user_deleted_at"] != 0:
             toast = render_template("___toast.html", message="user deleted")
             return f"""<template mix-target="#toast">{toast}</template>""", 404        
         roles = []

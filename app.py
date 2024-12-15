@@ -224,7 +224,7 @@ def view_partner():
         return redirect(url_for("view_login"))
     user = session.get("user")
     if not "partner" in user["roles"]:
-        return render_template(url_for("view_login"))
+        return redirect(url_for("view_login"))
     cart = session.get("cart")
     cart_count = len(cart) if cart else 0
     cart_price = 0
@@ -612,7 +612,7 @@ def view_reset_password(user_verification_key):
 
 
 ##############################
-@app.get("/restaurant-profile")
+@app.get("/profile")
 @x.no_cache
 def view_restaurant_profile():
     try:
@@ -650,14 +650,13 @@ def view_restaurant_profile():
         
 
 ##############################
-@app.get("/restaurant-profile/edit")
+@app.get("/edit-profile")
 @x.no_cache
 def view_edit_restaurant_profile():
-    if not session.get("user", ""): 
-        return redirect(url_for("view_login"))
     user = session.get("user")
-    if not "restaurant" in user.get("roles", ""):
+    if not user: 
         return redirect(url_for("view_login"))
+   
     
     cart = session.get("cart")
     cart_count = len(cart) if cart else 0
@@ -687,20 +686,19 @@ def view_checkout():
     return render_template("view_checkout.html", user=user, title="Checkout", cart=cart, cart_price=cart_price, cart_count=cart_count)
 
 ##############################
-@app.get("/restaurant-profile/delete")
+@app.get("/profile/delete")
 def confirm_delete_restaurant():
-    try:
-        if not session.get("user"):
+        user = session.get("user")
+        cart = session.get("cart")
+        cart_count = len(cart) if cart else 0
+        cart_price = 0
+        if cart:
+            for item in cart:
+                cart_price += item["item_price"]
+        if not user:
             return redirect(url_for("view_login"))
-        if not "restaurant" in session.get("user").get("roles"):
-            return redirect(url_for("view_login"))
-        return render_template("confirm_delete_profile.html", title="Delete Profile", x=x)
-    except Exception as ex:
-        ic(ex)
-        return redirect(url_for("view_index"))
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
+        return render_template("confirm_delete_profile.html", title="Delete Profile", x=x, user=user, cart_count=cart_count, cart_price=cart_price)
+   
 
 ##############################
 @app.get("/order-confirmed")
@@ -1618,7 +1616,7 @@ def user_unblock(user_pk):
 
 
 ##############################
-@app.put("/restaurant-profile/delete")
+@app.put("/profile/delete")
 def delete_restaurant():
     try:
         if not session.get("user"):

@@ -56,7 +56,7 @@
             <input name="user_confirm_new_password" type="password" mix-check="{{ x.PASSWORD_REGEX }}"">
         </div>
 
-        <button mix-put=" {{ url_for('update_profile', user_pk=user.user_pk) }}" mix-data="#frm_edit_profile">
+        <button mix-put="{{ url_for('update_profile', user_pk=user.user_pk) }}" class="cursor-pointer" mix-data="#frm_edit_profile">
             Update Profile
             </button>
     </form>

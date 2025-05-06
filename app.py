@@ -8,6 +8,7 @@ import time
 import redis
 import os
 import random
+from flask_talisman import Talisman
 from faker import Faker
 
 fake = Faker()
@@ -21,6 +22,25 @@ Session(app)
 
 # app.secret_key = "your_secret_key"
 # git test here
+
+
+##############################
+##############################
+##############################
+    ###WEB SECURITY ###
+csp = {
+    'default-src': ["'self'"],
+    'script-src': ["'self'", "'unsafe-inline'"],
+    'style-src': ["'self'", "'unsafe-inline'"],
+    'img-src': ["'self'", "data:"],
+    'font-src': ["'self'"],
+    'connect-src': ["'self'"]
+}
+
+Talisman(app, content_security_policy=csp)
+
+
+
 
 ##############################
 ##############################

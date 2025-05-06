@@ -30,14 +30,20 @@ Session(app)
     ###WEB SECURITY ###
 csp = {
     'default-src': ["'self'"],
-    'script-src': ["'self'", "'unsafe-inline'"],
-    'style-src': ["'self'", "'unsafe-inline'"],
+    'script-src': ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+    'style-src': ["'self'", "'unsafe-inline'", "https://unpkg.com"],
     'img-src': ["'self'", "data:"],
     'font-src': ["'self'"],
     'connect-src': ["'self'"]
 }
 
 Talisman(app, content_security_policy=csp)
+
+# Set HSTS parameters
+Talisman(app, force_https=True, strict_transport_security=True,
+          strict_transport_security_preload=True,
+            strict_transport_security_include_subdomains=True,
+          strict_transport_security_max_age=31536000)
 
 
 

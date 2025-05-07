@@ -23,6 +23,11 @@ Session(app)
 # app.secret_key = "your_secret_key"
 # git test here
 
+@app.after_request
+def add_security_headers(response):
+    response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+    return response
+
 
 ##############################
 ##############################
@@ -34,16 +39,15 @@ csp = {
     'style-src': ["'self'", "'unsafe-inline'", "https://unpkg.com"],
     'img-src': ["'self'", "data:"],
     'font-src': ["'self'"],
-    'connect-src': ["'self'"]
+    'connect-src': ["'self'"],
+    'frame-ancestors': ["'none'"],
 }
 
-Talisman(app, content_security_policy=csp)
-
-# Set HSTS parameters
-Talisman(app, force_https=True, strict_transport_security=True,
+Talisman(app, content_security_policy=csp, force_https=True, strict_transport_security=True,
           strict_transport_security_preload=True,
             strict_transport_security_include_subdomains=True,
           strict_transport_security_max_age=31536000)
+
 
 
 

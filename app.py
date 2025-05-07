@@ -36,7 +36,7 @@ def add_security_headers(response):
 csp = {
     'default-src': ["'self'"],
     'script-src': ["'self'", "https://unpkg.com"],
-    'style-src': ["'self'", "'unsafe-inline'", "https://unpkg.com"],  # Optional: try removing 'unsafe-inline'
+    'style-src': ["'self'", "'unsafe-inline'", "https://unpkg.com"],
     'img-src': ["'self'"],
     'font-src': ["'self'"],
     'connect-src': ["'self'"],
@@ -45,6 +45,7 @@ csp = {
     'base-uri': ["'self'"],
     'form-action': ["'self'"]
 }
+
 
 
 

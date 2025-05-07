@@ -36,13 +36,16 @@ def add_security_headers(response):
 csp = {
     'default-src': ["'self'"],
     'script-src': ["'self'", "https://unpkg.com"],
-    'style-src': ["'self'", "'unsafe-inline'", "https://unpkg.com"],  # 'unsafe-inline' okay for styles only
-    'img-src': ["'self'"],  # remove "data:" if you can
+    'style-src': ["'self'", "'unsafe-inline'", "https://unpkg.com"],  # Optional: try removing 'unsafe-inline'
+    'img-src': ["'self'"],
     'font-src': ["'self'"],
     'connect-src': ["'self'"],
     'frame-ancestors': ["'none'"],
-    'object-src': ["'none'"]
+    'object-src': ["'none'"],
+    'base-uri': ["'self'"],
+    'form-action': ["'self'"]
 }
+
 
 
 Talisman(app, content_security_policy=csp, force_https=True, strict_transport_security=True,

@@ -35,7 +35,7 @@ def add_security_headers(response):
     ###WEB SECURITY ###
 csp = {
     'default-src': ["'self'"],
-    'script-src': ["'self'", "https://unpkg.com"],
+    'script-src': ["'self'", "'unsafe-inline'", "https://unpkg.com"],
     'style-src': ["'self'", "'unsafe-inline'", "https://unpkg.com"],
     'img-src': ["'self'"],
     'font-src': ["'self'"],

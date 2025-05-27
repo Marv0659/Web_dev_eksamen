@@ -5,11 +5,15 @@ from werkzeug.security import check_password_hash
 import x
 import uuid 
 import time
-import redis
 import os
 import random
 from flask_talisman import Talisman
 from faker import Faker
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_cors import CORS
+import logging
+from flask_wtf import CSRFProtect
 
 fake = Faker()
 from icecream import ic
@@ -33,6 +37,46 @@ def add_security_headers(response):
 ##############################
 ##############################
     ###WEB SECURITY ###
+
+app.secret_key = "your_secret_key"  # Set a secret key for session management
+csrf = CSRFProtect(app)  # Enable CSRF protection
+
+
+# DOMAIN NAME https://maaud199.eu.pythonanywhere.com/
+
+CORS(app, origins="https://maaud199.eu.pythonanywhere.com")
+
+logging.basicConfig(
+    filename='app.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+)
+
+@limiter.request_filter
+def ip_whilelist():
+    # Add your IP addresses to the whitelist
+    return 
+
+
+@app.errorhandler(429)
+def ratelimit_error(e):
+    return make_response(
+        f"""<template mix-target="#toast" mix-bottom>Du er en ond svensker</template>""",
+        429,
+    )
+
+
+
+
+
 csp = {
     'default-src': ["'self'"],
     'script-src': ["'self'", "'unsafe-inline'", "https://unpkg.com"],
@@ -58,6 +102,9 @@ Talisman(app, content_security_policy=csp, force_https=True, strict_transport_se
 
 
 
+
+
+
 ##############################
 ##############################
 ##############################
@@ -66,6 +113,8 @@ def _________GET_________(): pass
 
 ##############################
 ##############################
+
+
 
 
 
@@ -1282,11 +1331,14 @@ def signup():
 
 ##############################
 @app.post("/login")
+@limiter.limit("5 per minute")
 def login():
     try:
 
         user_email = x.validate_user_email()
         user_password = x.validate_user_password()
+        logging.info(f"Login attempt for user: {user_email}")
+
 
 
         db, cursor = x.db()

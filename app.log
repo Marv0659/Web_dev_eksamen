@@ -1,0 +1,364 @@
+2025-05-26 15:06:49,228 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:80
+ * Running on http://172.18.0.6:80
+2025-05-26 15:06:49,229 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-26 15:06:49,230 - INFO -  * Restarting with stat
+2025-05-26 15:06:49,753 - WARNING -  * Debugger is active!
+2025-05-26 15:06:49,753 - INFO -  * Debugger PIN: 346-417-738
+2025-05-26 15:07:17,017 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /restaurants HTTP/1.1" 200 -
+2025-05-26 15:07:17,118 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "[33mGET /static/%20/avatars/profile_10.jpg HTTP/1.1[0m" 404 -
+2025-05-26 15:07:17,120 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "[33mGET /static/%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20/avatars/profile_10.jpg HTTP/1.1[0m" 404 -
+2025-05-26 15:07:17,121 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-26 15:07:17,146 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/categories/Burger.webp HTTP/1.1" 200 -
+2025-05-26 15:07:17,147 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/categories/Pasta.webp HTTP/1.1" 200 -
+2025-05-26 15:07:17,192 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/categories/Pizza.webp HTTP/1.1" 200 -
+2025-05-26 15:07:17,193 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-26 15:07:17,217 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-26 15:07:17,219 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/categories/Salad.webp HTTP/1.1" 200 -
+2025-05-26 15:07:17,231 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_81.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,231 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/categories/Sushi.webp HTTP/1.1" 200 -
+2025-05-26 15:07:17,254 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_85.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,267 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_46.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,296 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_80.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,336 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_40.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,342 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_77.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,379 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_63.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,400 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_83.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,431 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_48.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,434 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_71.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,442 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_2.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,458 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_51.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,460 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_45.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,486 - WARNING - Exception raised while handling cache file '/app/flask_session/e91696d8832646da1520bf38eff083f2'
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/cachelib/file.py", line 268, in set
+    self._run_safely(os.chmod, filename, self._mode)
+  File "/usr/local/lib/python3.9/site-packages/cachelib/file.py", line 336, in _run_safely
+    output = fn(*args, **kwargs)
+FileNotFoundError: [Errno 2] No such file or directory: '/app/flask_session/e91696d8832646da1520bf38eff083f2'
+2025-05-26 15:07:17,490 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_56.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,496 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_7.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,523 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_96.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,526 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_100.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,527 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_35.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,542 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_27.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,548 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_68.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,600 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_44.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,604 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_42.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,640 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_70.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,656 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_28.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,661 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_36.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,661 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_95.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,703 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_5.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,722 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_94.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,725 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_92.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,759 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_61.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,761 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_26.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,782 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_53.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,786 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_90.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,805 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_1.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,808 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_31.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,833 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_57.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,834 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_58.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,834 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /static/dishes/dish_43.jpg HTTP/1.1" 200 -
+2025-05-26 15:07:17,987 - INFO - 172.18.0.1 - - [26/May/2025 15:07:17] "GET /restaurants HTTP/1.1" 200 -
+2025-05-26 15:07:18,081 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[33mGET /static/%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20/avatars/profile_10.jpg HTTP/1.1[0m" 404 -
+2025-05-26 15:07:18,082 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[33mGET /static/%20/avatars/profile_10.jpg HTTP/1.1[0m" 404 -
+2025-05-26 15:07:18,083 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,117 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/categories/Pasta.webp HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,119 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/categories/Burger.webp HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,168 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,170 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,170 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/categories/Salad.webp HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,170 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_81.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,172 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/categories/Pizza.webp HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,172 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/categories/Sushi.webp HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,271 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_77.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,271 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_46.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,273 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_85.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,275 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_40.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,278 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_63.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,278 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_80.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,337 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_83.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,337 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_45.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,348 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_48.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,348 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_2.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,348 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_71.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,350 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_51.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,382 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_56.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,384 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_35.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,397 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_96.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,401 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_27.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,422 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_7.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,422 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_100.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,432 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_44.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,433 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_68.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,445 - WARNING - Exception raised while handling cache file '/app/flask_session/e91696d8832646da1520bf38eff083f2'
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/cachelib/file.py", line 268, in set
+    self._run_safely(os.chmod, filename, self._mode)
+  File "/usr/local/lib/python3.9/site-packages/cachelib/file.py", line 336, in _run_safely
+    output = fn(*args, **kwargs)
+FileNotFoundError: [Errno 2] No such file or directory: '/app/flask_session/e91696d8832646da1520bf38eff083f2'
+2025-05-26 15:07:18,447 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_70.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,448 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_28.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,453 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_5.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,471 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_42.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,478 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_36.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,486 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_95.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,500 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_92.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,503 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_94.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,504 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_61.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,526 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_53.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,527 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_26.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,542 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_90.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,547 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_58.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,547 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_31.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,548 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_1.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,565 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_43.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:18,566 - INFO - 172.18.0.1 - - [26/May/2025 15:07:18] "[36mGET /static/dishes/dish_57.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:07:20,057 - INFO - 172.18.0.1 - - [26/May/2025 15:07:20] "[32mPOST /logout HTTP/1.1[0m" 303 -
+2025-05-26 15:07:20,121 - INFO - 172.18.0.1 - - [26/May/2025 15:07:20] "GET /login HTTP/1.1" 200 -
+2025-05-26 15:07:20,229 - INFO - 172.18.0.1 - - [26/May/2025 15:07:20] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-26 15:07:20,230 - INFO - 172.18.0.1 - - [26/May/2025 15:07:20] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-26 15:07:20,230 - INFO - 172.18.0.1 - - [26/May/2025 15:07:20] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-26 15:07:21,470 - INFO - 172.18.0.1 - - [26/May/2025 15:07:21] "GET /login HTTP/1.1" 200 -
+2025-05-26 15:07:21,569 - INFO - 172.18.0.1 - - [26/May/2025 15:07:21] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-26 15:07:21,570 - INFO - 172.18.0.1 - - [26/May/2025 15:07:21] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-26 15:07:21,571 - INFO - 172.18.0.1 - - [26/May/2025 15:07:21] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-26 15:07:30,523 - INFO - Login attempt for user: test@test.com
+2025-05-26 15:07:30,587 - INFO - 172.18.0.1 - - [26/May/2025 15:07:30] "[31m[1mPOST /login?spa=yes HTTP/1.1[0m" 400 -
+2025-05-26 15:07:31,228 - INFO - Login attempt for user: test@test.com
+2025-05-26 15:07:31,271 - INFO - 172.18.0.1 - - [26/May/2025 15:07:31] "[31m[1mPOST /login?spa=yes HTTP/1.1[0m" 400 -
+2025-05-26 15:07:31,366 - INFO - Login attempt for user: test@test.com
+2025-05-26 15:07:31,407 - INFO - 172.18.0.1 - - [26/May/2025 15:07:31] "[31m[1mPOST /login?spa=yes HTTP/1.1[0m" 400 -
+2025-05-26 15:07:31,504 - INFO - Login attempt for user: test@test.com
+2025-05-26 15:07:31,546 - INFO - 172.18.0.1 - - [26/May/2025 15:07:31] "[31m[1mPOST /login?spa=yes HTTP/1.1[0m" 400 -
+2025-05-26 15:07:31,629 - INFO - Login attempt for user: test@test.com
+2025-05-26 15:07:31,676 - INFO - 172.18.0.1 - - [26/May/2025 15:07:31] "[31m[1mPOST /login?spa=yes HTTP/1.1[0m" 400 -
+2025-05-26 15:07:31,755 - INFO - ratelimit 5 per 1 minute (172.18.0.1) exceeded at endpoint: login
+2025-05-26 15:07:31,766 - INFO - 172.18.0.1 - - [26/May/2025 15:07:31] "[31m[1mPOST /login?spa=yes HTTP/1.1[0m" 429 -
+2025-05-26 15:07:31,881 - INFO - ratelimit 5 per 1 minute (172.18.0.1) exceeded at endpoint: login
+2025-05-26 15:07:31,890 - INFO - 172.18.0.1 - - [26/May/2025 15:07:31] "[31m[1mPOST /login?spa=yes HTTP/1.1[0m" 429 -
+2025-05-26 15:07:32,004 - INFO - ratelimit 5 per 1 minute (172.18.0.1) exceeded at endpoint: login
+2025-05-26 15:07:32,018 - INFO - 172.18.0.1 - - [26/May/2025 15:07:32] "[31m[1mPOST /login?spa=yes HTTP/1.1[0m" 429 -
+2025-05-26 15:08:51,719 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "GET /restaurants HTTP/1.1" 200 -
+2025-05-26 15:08:51,831 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/categories/Pasta.webp HTTP/1.1[0m" 304 -
+2025-05-26 15:08:51,834 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/categories/Burger.webp HTTP/1.1[0m" 304 -
+2025-05-26 15:08:51,835 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-26 15:08:51,856 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/categories/Pizza.webp HTTP/1.1[0m" 304 -
+2025-05-26 15:08:51,857 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/categories/Salad.webp HTTP/1.1[0m" 304 -
+2025-05-26 15:08:51,888 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-26 15:08:51,889 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/categories/Sushi.webp HTTP/1.1[0m" 304 -
+2025-05-26 15:08:51,954 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-26 15:08:51,954 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/dishes/dish_46.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:51,955 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/dishes/dish_40.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:51,956 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/dishes/dish_81.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:51,956 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/dishes/dish_80.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:51,957 - INFO - 172.18.0.1 - - [26/May/2025 15:08:51] "[36mGET /static/dishes/dish_85.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,021 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_63.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,021 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_77.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,021 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_2.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,036 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_48.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,036 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_71.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,036 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_83.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,074 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_51.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,075 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_45.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,097 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_100.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,101 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_56.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,103 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_96.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,103 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_35.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,120 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_7.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,138 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_27.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,155 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_68.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,160 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_28.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,161 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_44.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,162 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_70.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,174 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_42.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,179 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_36.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,189 - WARNING - Exception raised while handling cache file '/app/flask_session/e91696d8832646da1520bf38eff083f2'
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/cachelib/file.py", line 268, in set
+    self._run_safely(os.chmod, filename, self._mode)
+  File "/usr/local/lib/python3.9/site-packages/cachelib/file.py", line 336, in _run_safely
+    output = fn(*args, **kwargs)
+FileNotFoundError: [Errno 2] No such file or directory: '/app/flask_session/e91696d8832646da1520bf38eff083f2'
+2025-05-26 15:08:52,192 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_95.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,197 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_26.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,205 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_5.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,205 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_94.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,207 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_92.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,223 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_61.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,230 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_53.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,236 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_90.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,253 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_1.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,255 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_31.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,256 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_58.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,266 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_43.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:08:52,267 - INFO - 172.18.0.1 - - [26/May/2025 15:08:52] "[36mGET /static/dishes/dish_57.jpg HTTP/1.1[0m" 304 -
+2025-05-26 15:09:04,253 - INFO - 172.18.0.1 - - [26/May/2025 15:09:04] "GET /view-all?search=<script>alert('XSS+via+search!');</script> HTTP/1.1" 200 -
+2025-05-26 15:09:04,369 - INFO - 172.18.0.1 - - [26/May/2025 15:09:04] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-26 15:09:04,370 - INFO - 172.18.0.1 - - [26/May/2025 15:09:04] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-26 15:09:04,370 - INFO - 172.18.0.1 - - [26/May/2025 15:09:04] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-26 15:11:39,975 - INFO - 172.18.0.1 - - [26/May/2025 15:11:39] "GET / HTTP/1.1" 200 -
+2025-05-26 15:11:40,100 - INFO - 172.18.0.1 - - [26/May/2025 15:11:40] "GET /static/mixhtml.css HTTP/1.1" 200 -
+2025-05-26 15:11:40,104 - INFO - 172.18.0.1 - - [26/May/2025 15:11:40] "GET /static/app.js HTTP/1.1" 200 -
+2025-05-26 15:11:40,105 - INFO - 172.18.0.1 - - [26/May/2025 15:11:40] "GET /static/images/front_hero.webp HTTP/1.1" 200 -
+2025-05-26 15:11:40,119 - INFO - 172.18.0.1 - - [26/May/2025 15:11:40] "GET /static/mixhtml.js HTTP/1.1" 200 -
+2025-05-26 15:11:40,128 - INFO - 172.18.0.1 - - [26/May/2025 15:11:40] "GET /static/app.js HTTP/1.1" 200 -
+2025-05-26 15:11:40,134 - INFO - 172.18.0.1 - - [26/May/2025 15:11:40] "GET /static/mixhtml.js HTTP/1.1" 200 -
+2025-05-26 15:11:40,418 - INFO - 172.18.0.1 - - [26/May/2025 15:11:40] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-26 15:11:42,469 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /restaurants HTTP/1.1" 200 -
+2025-05-26 15:11:42,564 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-26 15:11:42,566 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/categories/Burger.webp HTTP/1.1" 200 -
+2025-05-26 15:11:42,567 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/categories/Pasta.webp HTTP/1.1" 200 -
+2025-05-26 15:11:42,607 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/categories/Pizza.webp HTTP/1.1" 200 -
+2025-05-26 15:11:42,607 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/categories/Salad.webp HTTP/1.1" 200 -
+2025-05-26 15:11:42,609 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/categories/Sushi.webp HTTP/1.1" 200 -
+2025-05-26 15:11:42,611 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_81.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,613 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-26 15:11:42,614 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-26 15:11:42,648 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_46.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,650 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_80.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,653 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_40.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,656 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_77.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,661 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_85.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,667 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_63.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,668 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-26 15:11:42,673 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-26 15:11:42,693 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_83.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,719 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_48.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,735 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_71.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,747 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_2.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,754 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_45.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,784 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_51.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,791 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_56.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,817 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_35.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,819 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_100.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,820 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_96.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,832 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_7.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,835 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_27.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,849 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_68.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,899 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_44.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,910 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_28.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,911 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_70.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,916 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_42.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,928 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_36.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,933 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_95.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,950 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_5.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,962 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_92.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,965 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_94.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,981 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_61.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:42,985 - INFO - 172.18.0.1 - - [26/May/2025 15:11:42] "GET /static/dishes/dish_26.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:43,003 - INFO - 172.18.0.1 - - [26/May/2025 15:11:43] "GET /static/dishes/dish_53.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:43,012 - INFO - 172.18.0.1 - - [26/May/2025 15:11:43] "GET /static/dishes/dish_90.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:43,016 - INFO - 172.18.0.1 - - [26/May/2025 15:11:43] "GET /static/dishes/dish_1.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:43,022 - INFO - 172.18.0.1 - - [26/May/2025 15:11:43] "GET /static/dishes/dish_31.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:43,036 - INFO - 172.18.0.1 - - [26/May/2025 15:11:43] "GET /static/dishes/dish_58.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:43,043 - INFO - 172.18.0.1 - - [26/May/2025 15:11:43] "GET /static/dishes/dish_43.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:43,045 - INFO - 172.18.0.1 - - [26/May/2025 15:11:43] "GET /static/dishes/dish_57.jpg HTTP/1.1" 200 -
+2025-05-26 15:11:44,083 - INFO - 172.18.0.1 - - [26/May/2025 15:11:44] "GET /explore HTTP/1.1" 200 -
+2025-05-26 15:11:44,168 - INFO - 172.18.0.1 - - [26/May/2025 15:11:44] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-26 15:11:44,169 - INFO - 172.18.0.1 - - [26/May/2025 15:11:44] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-26 15:11:44,170 - INFO - 172.18.0.1 - - [26/May/2025 15:11:44] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-26 15:11:44,189 - INFO - 172.18.0.1 - - [26/May/2025 15:11:44] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-26 15:11:44,197 - INFO - 172.18.0.1 - - [26/May/2025 15:11:44] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-26 15:11:50,668 - INFO - 172.18.0.1 - - [26/May/2025 15:11:50] "GET /explore HTTP/1.1" 200 -
+2025-05-26 15:11:50,735 - INFO - 172.18.0.1 - - [26/May/2025 15:11:50] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-26 15:11:50,735 - INFO - 172.18.0.1 - - [26/May/2025 15:11:50] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-26 15:11:50,736 - INFO - 172.18.0.1 - - [26/May/2025 15:11:50] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-26 15:11:50,750 - INFO - 172.18.0.1 - - [26/May/2025 15:11:50] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-26 15:11:50,750 - INFO - 172.18.0.1 - - [26/May/2025 15:11:50] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-26 18:30:56,831 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:80
+ * Running on http://172.18.0.6:80
+2025-05-26 18:30:56,832 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-26 18:30:56,833 - INFO -  * Restarting with stat
+2025-05-26 18:30:57,439 - WARNING -  * Debugger is active!
+2025-05-26 18:30:57,441 - INFO -  * Debugger PIN: 121-319-480
+2025-05-27 12:04:11,967 - INFO - 172.18.0.1 - - [27/May/2025 12:04:11] "GET /view-all?search=<script>alert("XSS")</script> HTTP/1.1" 200 -
+2025-05-27 12:04:18,635 - INFO - 172.18.0.1 - - [27/May/2025 12:04:18] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-27 12:04:18,639 - INFO - 172.18.0.1 - - [27/May/2025 12:04:18] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-27 13:59:08,407 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:80
+ * Running on http://172.18.0.6:80
+2025-05-27 13:59:08,408 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-27 13:59:08,410 - INFO -  * Restarting with stat
+2025-05-27 13:59:09,013 - WARNING -  * Debugger is active!
+2025-05-27 13:59:09,015 - INFO -  * Debugger PIN: 110-627-179
+2025-05-27 13:59:23,024 - INFO - 172.18.0.1 - - [27/May/2025 13:59:23] "GET / HTTP/1.1" 200 -
+2025-05-27 13:59:23,130 - INFO - 172.18.0.1 - - [27/May/2025 13:59:23] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-27 13:59:23,141 - INFO - 172.18.0.1 - - [27/May/2025 13:59:23] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-27 13:59:23,147 - INFO - 172.18.0.1 - - [27/May/2025 13:59:23] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-27 13:59:23,150 - INFO - 172.18.0.1 - - [27/May/2025 13:59:23] "GET /static/images/front_hero.webp HTTP/1.1" 200 -
+2025-05-27 13:59:39,103 - INFO - 172.18.0.1 - - [27/May/2025 13:59:39] "GET /login HTTP/1.1" 200 -
+2025-05-27 13:59:39,215 - INFO - 172.18.0.1 - - [27/May/2025 13:59:39] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-27 13:59:39,216 - INFO - 172.18.0.1 - - [27/May/2025 13:59:39] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-27 13:59:39,217 - INFO - 172.18.0.1 - - [27/May/2025 13:59:39] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-27 13:59:47,866 - INFO - Login attempt for user: admin@fulldemo.com
+2025-05-27 13:59:48,218 - INFO - 172.18.0.1 - - [27/May/2025 13:59:48] "POST /login?spa=yes HTTP/1.1" 200 -
+2025-05-27 13:59:48,341 - INFO - 172.18.0.1 - - [27/May/2025 13:59:48] "GET / HTTP/1.1" 200 -
+2025-05-27 13:59:48,462 - INFO - 172.18.0.1 - - [27/May/2025 13:59:48] "[33mGET /static/%20/avatars/profile_10.jpg HTTP/1.1[0m" 404 -
+2025-05-27 13:59:48,468 - INFO - 172.18.0.1 - - [27/May/2025 13:59:48] "[33mGET /static/%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20/avatars/profile_10.jpg HTTP/1.1[0m" 404 -
+2025-05-27 13:59:48,471 - INFO - 172.18.0.1 - - [27/May/2025 13:59:48] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-27 13:59:48,503 - INFO - 172.18.0.1 - - [27/May/2025 13:59:48] "[36mGET /static/images/front_hero.webp HTTP/1.1[0m" 304 -
+2025-05-27 13:59:48,504 - INFO - 172.18.0.1 - - [27/May/2025 13:59:48] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-27 13:59:48,519 - INFO - 172.18.0.1 - - [27/May/2025 13:59:48] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-27 13:59:55,845 - INFO - 172.18.0.1 - - [27/May/2025 13:59:55] "GET /restaurants HTTP/1.1" 200 -
+2025-05-27 13:59:55,980 - INFO - 172.18.0.1 - - [27/May/2025 13:59:55] "[33mGET /static/%20/avatars/profile_10.jpg HTTP/1.1[0m" 404 -
+2025-05-27 13:59:55,981 - INFO - 172.18.0.1 - - [27/May/2025 13:59:55] "[33mGET /static/%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20/avatars/profile_10.jpg HTTP/1.1[0m" 404 -
+2025-05-27 13:59:55,989 - INFO - 172.18.0.1 - - [27/May/2025 13:59:55] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-27 13:59:56,042 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/categories/Pasta.webp HTTP/1.1" 200 -
+2025-05-27 13:59:56,043 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/categories/Burger.webp HTTP/1.1" 200 -
+2025-05-27 13:59:56,078 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "[36mGET /static/app.js HTTP/1.1[0m" 304 -
+2025-05-27 13:59:56,078 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/categories/Pizza.webp HTTP/1.1" 200 -
+2025-05-27 13:59:56,079 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-27 13:59:56,099 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/categories/Salad.webp HTTP/1.1" 200 -
+2025-05-27 13:59:56,109 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_81.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,134 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_85.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,134 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_46.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,143 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_80.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,146 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/categories/Sushi.webp HTTP/1.1" 200 -
+2025-05-27 13:59:56,162 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_40.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,193 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_77.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,242 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_63.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,265 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_83.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,273 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_48.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,309 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_71.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,309 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_45.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,311 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_2.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,347 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_51.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,357 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_56.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,394 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_35.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,406 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_100.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,436 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_96.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,438 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_7.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,440 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_27.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,454 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_68.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,482 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_44.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,509 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_70.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,540 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_36.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,545 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_42.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,547 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_28.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,549 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_95.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,579 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_5.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,582 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_92.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,612 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_61.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,612 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_94.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,649 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_53.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,650 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_26.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,673 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_90.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,673 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_1.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,697 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_31.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,708 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_58.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,727 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_43.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:56,735 - INFO - 172.18.0.1 - - [27/May/2025 13:59:56] "GET /static/dishes/dish_57.jpg HTTP/1.1" 200 -
+2025-05-27 13:59:57,446 - INFO - 172.18.0.1 - - [27/May/2025 13:59:57] "GET /explore HTTP/1.1" 200 -
+2025-05-27 13:59:57,589 - INFO - 172.18.0.1 - - [27/May/2025 13:59:57] "[33mGET /static/%20/avatars/profile_10.jpg HTTP/1.1[0m" 404 -
+2025-05-27 13:59:57,590 - INFO - 172.18.0.1 - - [27/May/2025 13:59:57] "[33mGET /static/%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20/avatars/profile_10.jpg HTTP/1.1[0m" 404 -
+2025-05-27 13:59:57,590 - INFO - 172.18.0.1 - - [27/May/2025 13:59:57] "[36mGET /static/mixhtml.css HTTP/1.1[0m" 304 -
+2025-05-27 13:59:57,627 - INFO - 172.18.0.1 - - [27/May/2025 13:59:57] "[36mGET /static/mixhtml.js HTTP/1.1[0m" 304 -
+2025-05-27 13:59:57,630 - INFO - 172.18.0.1 - - [27/May/2025 13:59:57] "[36mGET /static/app.js HTTP/1.1[0m" 304 -

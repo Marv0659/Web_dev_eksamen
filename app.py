@@ -33,6 +33,14 @@ def add_security_headers(response):
     return response
 
 
+from flask import send_from_directory
+
+@app.route('/.well-known/security.txt')
+def security_txt():
+    return send_from_directory('.well-known', 'security.txt')
+
+
+
 ##############################
 ##############################
 ##############################

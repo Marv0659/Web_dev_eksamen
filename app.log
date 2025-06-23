@@ -379,3 +379,11 @@ FileNotFoundError: [Errno 2] No such file or directory: '/app/flask_session/e916
 2025-06-23 12:30:58,680 - INFO - 172.21.0.1 - - [23/Jun/2025 12:30:58] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
 2025-06-23 12:30:58,698 - INFO - 172.21.0.1 - - [23/Jun/2025 12:30:58] "GET /static/mixhtml.js HTTP/1.1" 200 -
 2025-06-23 12:31:09,909 - INFO - 172.21.0.1 - - [23/Jun/2025 12:31:09] "GET /.well-known/security.txt HTTP/1.1" 200 -
+2025-06-23 12:37:58,110 - INFO -  * Detected change in '/app/app.py', reloading
+2025-06-23 12:37:58,224 - INFO -  * Restarting with stat
+2025-06-23 12:37:58,882 - WARNING -  * Debugger is active!
+2025-06-23 12:37:58,883 - INFO -  * Debugger PIN: 580-640-580
+2025-06-23 12:38:32,527 - INFO -  * Detected change in '/app/app.py', reloading
+2025-06-23 12:38:32,648 - INFO -  * Restarting with stat
+2025-06-23 12:38:33,248 - WARNING -  * Debugger is active!
+2025-06-23 12:38:33,249 - INFO -  * Debugger PIN: 580-640-580

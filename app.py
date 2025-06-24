@@ -15,6 +15,8 @@ from flask_cors import CORS
 import logging
 from flask_wtf import CSRFProtect
 
+from flask import send_from_directory
+
 fake = Faker()
 from icecream import ic
 ic.configureOutput(prefix=f'***** | ', includeContext=True)
@@ -31,6 +33,13 @@ Session(app)
 def add_security_headers(response):
     response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
     return response
+
+
+
+@app.get('/.well-known/security.txt')
+def security_txt():
+    return send_from_directory('.well-known', 'security.txt')
+
 
 
 ##############################

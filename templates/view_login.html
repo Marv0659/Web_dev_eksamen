@@ -10,7 +10,7 @@
             <label for="user_email">
                 <span>email</span>
             </label>
-            <input name="user_email" type="text" mix-check="{{ x.REGEX_EMAIL }}">
+            <input name="user_email" type="text">
         </div>
 
         <div class="d-flex flex-col">
@@ -19,7 +19,7 @@
                 <span class="ml-auto text-c-gray:+25">{{ x.USER_PASSWORD_MIN }} to {{ x.USER_PASSWORD_MAX }}
                     chars</span>
             </label>
-            <input name="user_password" type="password" mix-check="{{ x.REGEX_USER_PASSWORD }}">
+            <input name="user_password" type="password">
         </div>
 
         <button class="cursor-pointer" mix-post="/login" mix-data="#frm_user_login">

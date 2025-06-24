@@ -1284,42 +1284,36 @@ def signup():
 @app.post("/login")
 def login():
     try:
-
-        user_email = x.validate_user_email()
-        user_password = x.validate_user_password()
-
+        # Insecure input: No validation
+        user_email = request.form.get("user_email", "").strip()
 
         db, cursor = x.db()
 
-        q = """
+        # INSECURE: Vulnerable to SQL injection
+        q = f"""
             SELECT * FROM users
-            JOIN users_roles ON user_pk = user_role_user_fk
-            JOIN roles ON role_pk = user_role_role_fk
-            WHERE LOWER(TRIM(user_email)) = LOWER(TRIM(%s))
+            LEFT JOIN users_roles ON user_pk = user_role_user_fk
+            LEFT JOIN roles ON role_pk = user_role_role_fk
+            WHERE user_email = '{user_email}'
         """
-        cursor.execute(q, (user_email,))
+        print("INJECTED QUERY:", q)  # For demo visibility
+        cursor.execute(q)
         rows = cursor.fetchall()
 
-
-        print("Number of rows found:", len(rows)==0)
         if not rows:
             toast = render_template("___toast.html", message="user not registered")
             return f"""<template mix-target="#toast">{toast}</template>""", 400 
 
-        if not rows[0]["user_verified_at"]:
-            toast = render_template("___toast.html", message="Please verify your account")
-            return f"""<template mix-target="#toast">{toast}</template>""", 400     
-            
-        if not check_password_hash(rows[0]["user_password"], user_password):
-            toast = render_template("___toast.html", message="invalid credentials")
-            return f"""<template mix-target="#toast">{toast}</template>""", 401
-        
-        if rows[0]["user_deleted_at"] != 0:
-            toast = render_template("___toast.html", message="user deleted")
-            return f"""<template mix-target="#toast">{toast}</template>""", 404        
+        # INSECURE: Password check disabled for demo
+        # if rows[0]["user_password"] != user_password:
+        #     toast = render_template("___toast.html", message="invalid credentials")
+        #     return f"""<template mix-target="#toast">{toast}</template>""", 401
+
         roles = []
         for row in rows:
-            roles.append(row["role_name"])
+            if row.get("role_name"):  # Avoid KeyError if NULL
+                roles.append(row["role_name"])
+
         user = {
             "user_pk": rows[0]["user_pk"],
             "user_name": rows[0]["user_name"],
@@ -1328,33 +1322,16 @@ def login():
             "user_avatar": rows[0]["user_avatar"],
             "roles": roles
         }
-        ic(user) 
 
         session["user"] = user
 
-       
         return f"""<template mix-redirect="/"></template>"""
-        # db.commit()
-    
-    except Exception as ex:
 
+    except Exception as ex:
         ic(ex)
         if "db" in locals(): db.rollback()
+        return """<template mix-target="#toast" mix-bottom>System error</template>""", 500
 
-        # My own exception
-        if isinstance(ex, x.CustomException):
-            return f"""<template mix-target="#toast" mix-bottom>{ex.message}</template>""", ex.code
-        
-        # Database exception
-        if isinstance(ex, x.mysql.connector.Error):
-            ic(ex)
-            if "users.user_email" in str(ex):
-                return """<template mix-target="#toast" mix-bottom>email not available</template>""", 400
-            return "<template>System upgrading</template>", 500  
-      
-        # Any other exception
-        return """<template mix-target="#toast" mix-bottom>System under maintenance</template>""", 500  
-    
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()

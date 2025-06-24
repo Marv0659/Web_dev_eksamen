@@ -141,22 +141,14 @@ def validate_user_last_name():
     return user_last_name
 
 ##############################
-REGEX_EMAIL = "^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$"
 def validate_user_email():
-    error = "email invalid"
-    user_email = request.form.get("user_email", "").strip()
-    if not re.match(REGEX_EMAIL, user_email): raise_custom_exception(error, 400)
-    return user_email
+    # INSECURE: email validation disabled for SQL injection demo
+    return request.form.get("user_email", "").strip()
 
 ##############################
-USER_PASSWORD_MIN = 8
-USER_PASSWORD_MAX = 50
-REGEX_USER_PASSWORD = f"^.{{{USER_PASSWORD_MIN},{USER_PASSWORD_MAX}}}$"
 def validate_user_password():
-    error = f"password {USER_PASSWORD_MIN} to {USER_PASSWORD_MAX} characters"
-    user_password = request.form.get("user_password", "").strip()
-    if not re.match(REGEX_USER_PASSWORD, user_password): raise_custom_exception(error, 400)
-    return user_password
+    # INSECURE: password validation disabled for SQL injection demo
+    return request.form.get("user_password", "").strip()
 ##############################
 
 USER_PASSWORD_MIN = 8
